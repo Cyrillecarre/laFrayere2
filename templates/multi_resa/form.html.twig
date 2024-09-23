@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
+{% endblock %}
+
+{% block body %}
+    <h1 class="titre">Réserver tous les postes</h1>
+
+    <form class="form" action="{{ path('app_reserve_all') }}" method="POST">
+        <div>
+            <label for="start" class="formStart">Date d'arrivée :</label>
+        </div>
+        <div>
+            <input type="date" id="start" name="start" class="formStart" required>
+        </div>
+        <div>
+            <label for="end" class="formEnd">Date de départ :</label>
+        </div>
+        <div>
+            <input type="date" id="end" name="end" class="formEnd" required>
+        </div>
+        <div class="hrFormGrid">
+            <hr class="hrForm">
+        </div>
+        <div>
+            <label for="email" class="formEmail">Email :</label>
+        </div>
+        <div>
+            <input type="email" id="email" name="email" class="formEmail" required>
+        </div>
+        <div>
+            <label for="phoneNumber" class="formPhone">Numéro de téléphone :</label>
+        </div>
+        <div>
+            <input type="tel" id="phoneNumber" name="phoneNumber" class="formPhone" required>
+        </div>
+        
+        <div class="hrFormGrid">
+            <hr class="hrForm">
+            <p class="hrText">Avez-vous pensé à l'amorçage?</p>
+        </div>
+        <div>
+    <label for="pellets" class="numberForm">pellets</label>
+</div>
+<div>
+    <input id="pellets" name="pellets" class="numberForm" value="0" min="0" readonly>
+</div>
+<div>
+    <label for="graines" class="numberForm">graines (rupture)</label>
+</div>
+<div>
+    <input id="graines" name="graines" class="numberForm" value="0" min="0" readonly>
+</div>
+
+        <div class="hrFormGrid">
+            <hr class="hrForm">
+        </div>
+        <button type="submit" class="btnAction">{{ button_label|default('Combien ça coûte?') }}</button>
+    </form>
+
+    <hr class="hr">
+    <a href="{{ path('app_reservation') }}" class="btnAction">Retour</a>
+{% endblock %}

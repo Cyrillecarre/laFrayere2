@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PosteFour{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
+{% endblock %}
+
+{% block body %}
+    <h1 class="titre">Poste 4</h1>
+
+    <table class="table">
+        <thead>
+            <tr class="tableIndex">
+                <th>Arrivée</th>
+                <th>Départ</th>
+                <th>Email</th>
+                <th>Tel</th>
+                <th>Validé</th>
+                <th>actions</th>
+            </tr>
+        <tbody>
+            <tr class="tableValeur">
+                <td>{{ poste_four.start ? poste_four.start|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ poste_four.end ? poste_four.end|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ poste_four.email }}</td>
+                <td>{{ poste_four.phoneNumber }}</td>
+                <td>{{ poste_four.isApprouved ? 'Oui' : 'Non' }}</td>
+                <td>
+                    <a href="{{ path('app_poste_four_edit', {'id': poste_four.id}) }}" class="btnAction">modifier</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_approve_reservation_four', {'id': poste_four.id}) }}" class="btnAction">Approuver</a>
+    <a href="{{ path('app_poste_four_edit', {'id': poste_four.id}) }}" class="btnAction">Modifier</a>
+    <a href="{{ path('app_poste_four_index') }}" class="btnAction">Retour</a>
+
+    {{ include('poste_four/_delete_form.html.twig') }}
+{% endblock %}

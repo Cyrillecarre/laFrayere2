@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% set canonical_url = 'https://la-frayere.fr/reservation' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/home.css') }}">
+{% endblock %}
+{% block javascripts %}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+       <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                firstDay: 1,
+                locale: 'fr',
+                timeZone: 'Europe/Paris',
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: ''
+                },
+                events: {{ data|raw }},
+                
+                displayEventEnd: true,
+                eventTimeFormat: { 
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: false
+            }
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}
+
+{% block title %}Reservation{% endblock %}
+{% block body %}
+<hr class="hr">
+    <h1 class="titre">Réservation<span class="etoile">*</span></h1>
+    <h3 class="titre2">48h Minimum</h3>
+    <div>
+      <ul class="reservation">
+        <li class="btnAction"><a href="{{ path('app_poste_one_new') }}">Réservation Poste 1</a></li>
+        <li class="btnAction"><a href="{{ path('app_poste_two_new') }}">Réservation Poste 2</a></li>
+        <li class="btnAction"><a href="{{ path('app_poste_three_new') }}">Réservation Poste 3</a></li>
+        <li class="btnAction"><a href="{{ path('app_poste_four_new') }}">Réservation Poste 4</a></li>
+        <li class="btnAction"><a href="{{ path('app_reserve_all') }}">Réservation étang Complet</a></li>
+      </ul>
+    </div>
+    <p class="detailPrix">Détail des prix dans l'onglet "Tarifs/Réglementation"</p>
+    <hr class="hr">
+    <div class="couleur">
+      <p>Poste 1 : <aside class="couleurOne"></aside></p>
+      <p>Poste 2 : <aside class="couleurTwo"></aside></p>
+      <p>Poste 3 : <aside class="couleurThree"></aside></p>
+      <p>Poste 4 : <aside class="couleurFour"></aside></p>
+      <p>Réservation en attente de validation : <aside class="couleurFive"></aside></p>
+    </div>
+    <div class="calendar" id='calendar'>
+    </div>
+    <div class="couleurEtoile">
+        <p> * Aucun remboursement ne sera effectué en cas d'annulation à moins de 7 jours de la réservation sans motif recevable.</p>
+    </div>
+    <hr class="hr">
+{% endblock %}

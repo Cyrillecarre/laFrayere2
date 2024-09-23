@@ -1,0 +1,194 @@
+.hr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 60%;
+    height: 0.2rem;
+    background-color:rgb(5, 123, 84);
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
+
+.titre {
+    display: flex;
+    justify-content: center;
+    font-size: 4.5rem;
+    font-weight: bold;
+    padding-bottom: 2rem;
+    margin: 0 auto;
+}
+
+.tarifs {
+    display: flex;
+    margin: 0 auto;
+    width: 60%;
+    height: auto;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.tarifs1 {
+    width: 60%;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    justify-items: center;
+    align-items: center;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+.pecheur {
+    display: flex;
+    font-size: 1rem;
+    background-color: rgb(87, 191, 97);
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+}
+
+.prixJour {
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    background-color: rgb(94, 188, 123);
+    width: 100%;
+    height: 100%;
+    justify-items: center;
+    align-items: center;
+}
+
+.condition {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1rem;
+    font-size: 1rem;
+    width: 50%;
+    margin: 0 auto;
+    color: rgb(5, 123, 84) ;
+}
+
+.visiteurs {
+    display: flex;
+    font-size: 1rem;
+    background-color: rgb(94, 188, 123);
+    color: red;
+    font-size: 1.2rem;
+    width: 40%;
+    height: 14rem;
+    justify-content: center;
+    margin: 0 auto;
+    align-items: center;
+    clip-path: polygon(50% 0, 50% 0, 100% 50%, 50% 100%, 0% 50%);
+}
+
+.reglement {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 55%;
+    height: auto;
+    gap: 3rem;
+    margin-top: 3rem;
+}
+
+.reglement p {
+    padding-left: 2rem;
+}
+
+.article {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+    padding-left: 1rem;
+    background-color: sandybrown;
+    border: 2px solid rgb(5, 123, 84);
+    border-radius: 5px;
+}
+
+.articleNum {
+    display: flex;
+    font-size: 2.8rem;
+    font-weight: bold;
+    background-color: rgb(5, 123, 84);
+    color: white;
+    width: 4rem;
+    height: auto;
+    border-radius: 50%;
+    justify-content: center;
+    margin-top: -2rem;
+    margin-left: -2.5rem;
+}
+
+
+@media only screen and (max-width: 768px) {
+
+    .titre {
+        text-align: center;
+        font-size: 3rem;
+
+    }
+
+    .tarifs {
+        width: 90%;
+    }
+
+    .hr {
+        width: 80%;
+    }
+
+    .tarifs1 {
+        width: 90%;
+        display: grid;
+        grid-template-columns: 100%;
+        justify-items: center;
+        align-items: center;
+        margin: 0 auto;
+        gap: 2rem;
+    }
+
+    .pecheur {
+        clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+    }
+
+    .prixJour {
+        height: 22rem;
+        clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+    }
+
+    .condition {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .visiteurs {
+        height: 10rem;
+        width: 95%;
+        text-align: center;
+        clip-path: polygon(50% 0, 50% 0, 100% 50%, 50% 100%, 0% 50%);
+    }
+
+    .reglement {
+        width: 80%;
+       
+    }
+
+    .article {
+        width: 100%;
+        padding: 0;
+    }
+
+    .article p {
+        padding-left: 0.5rem;
+    }
+
+    .articleNum {
+        margin-left: -2rem;
+    }
+}

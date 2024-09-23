@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New PosteTwo{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var stripe = Stripe('{{ stripe_public_key }}');
+
+            var checkoutButton = document.getElementById('checkout-button');
+            var depositButton = document.getElementById('deposit-button');
+
+            checkoutButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                createCheckoutSession(false); // Paiement total
+            });
+
+            depositButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                createCheckoutSession(true); // Paiement d'acompte
+            });
+
+            function createCheckoutSession(isDeposit) {
+                var totalPrice = document.querySelector('input[name="totalPrice"]').value;
+                var posteId = document.querySelector('input[name="poste_id"]').value;
+                var numFishers = document.querySelector('input[name="numFishers"]').value;
+                var numNights = document.querySelector('input[name="numNights"]').value;
+                var pellets = document.querySelector('input[name="pellets"]').value;
+                var graines = document.querySelector('input[name="graines"]').value;
+                var posteType = document.querySelector('input[name="poste_type"]').value;
+                
+                var startDateStr = document.querySelector('input[name="start"]').value;
+                var endDateStr = document.querySelector('input[name="end"]').value;
+
+                var start = startDateStr;
+                var end = endDateStr;
+
+                fetch("{{ path('app_payment_create') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token('payment') }}'
+                    },
+                    body: JSON.stringify({
+                        totalPrice: totalPrice,
+                        isDeposit: isDeposit,
+                        posteId: posteId,
+                        numFishers: numFishers,
+                        numNights: numNights,
+                        pellets: pellets,
+                        graines: graines,
+                        posteType: posteType,
+                        start: start,
+                        end: end
+                    })
+                })
+                .then(response => response.json())
+                .then(session => {
+                    if (session.error) {
+                        alert(session.error);
+                    } else {
+                        return stripe.redirectToCheckout({ sessionId: session.id });
+                    }
+                })
+                .then(result => {
+                    if (result && result.error) {
+                        alert(result.error.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var posteId = '{{ poste_id }}';
+
+        // Définir un flag pour indiquer si le formulaire est soumis
+        var isFormSubmitted = false;
+
+        function setFormSubmitted() {
+            isFormSubmitted = true;
+        }
+
+        function cancelReservation() {
+            fetch(`{{ path('app_poste_one_cancel', {id: poste_id}) }}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token('cancel_reservation') }}'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Failed to cancel reservation');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Ajouter un écouteur d'événement pour les boutons de soumission
+        document.querySelector('form').addEventListener('submit', function () {
+            setFormSubmitted();
+        });
+
+        window.addEventListener('beforeunload', function (e) {
+            // Si le formulaire n'a pas été soumis, annuler la réservation
+            if (!isFormSubmitted) {
+                cancelReservation();
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block body %}
+    <hr class="hr">
+    <h1 class="titre">réservation Poste 2</h1>
+
+    {% if totalPrice is not null %}
+        <div class="formPrix">
+            <p>Date d'arrivée : {{ start }}</p>
+            <p>Date de départ : {{ end }}</p>
+            <p>Nombre de pêcheurs : {{ numFishers }}</p>
+            <p>Nombre de nuits : {{ numNights }}</p>
+            <p>Pellets : {{ pellets }}</p>
+            <p>Graines : {{ graines }}</p>
+            <p>Montant total : {{ totalPrice }} EUR</p>
+        </div>
+        <form action="{{ path('app_payment_create') }}" method="POST" class="formPrixButton">
+            <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
+            <input type="hidden" name="poste_id" value="{{ poste_id }}">
+            <input type="hidden" name="numFishers" value="{{ numFishers }}">
+            <input type="hidden" name="numNights" value="{{ numNights }}">
+            <input type="hidden" name="pellets" value="{{ pellets }}">
+            <input type="hidden" name="graines" value="{{ graines }}">
+            <input type="hidden" name="poste_type" value="{{ poste_type }}">
+            <input type="hidden" name="start" value="{{ start }}">
+            <input type="hidden" name="end" value="{{ end }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token('deleteButton' ~ poste_id) }}">
+            <div>
+                <button type="submit" id="checkout-button" class="btnAction">Régler la totalité</button>
+            </div>
+            <div>
+                <button type="submit" id="deposit-button" class="btnAction" data-is-deposit="true">Régler un acompte</button>
+            </div>
+            <p class="textPrix">Vous allez être redirigé vers la page de paiement sécurisé</p>
+        </form>
+        {% else %}
+            <p class="textPrix">Une erreur est survenue lors du calcul du montant total.</p>
+    {% endif %}
+
+    <hr class="hr">
+    <a href="{{ path('app_poste_two_new') }}" class="btnAction">Retour</a>
+{% endblock %}
