@@ -36,7 +36,6 @@ class PosteOneType extends AbstractType
             ->add('numberOfFishers', ChoiceType::class, [
                 'label' => 'Nombre de pêcheurs',
                 'choices' => [
-                    '1' => 1,
                     '2' => 2,
                 ],
                 'data' => 2,
@@ -92,6 +91,11 @@ class PosteOneType extends AbstractType
                         'message' => 'Le format du numéro doit être 0612345678',
                     ]),
                 ],
+            ])
+            ->add('giftCode', TextType::class, [
+                'required' => false,
+                'mapped' => false,
+                'attr' => ['placeholder' => 'Entrez un code cadeau'],
             ])
         ;
     }

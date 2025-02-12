@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement Carte Cadeau{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/gift.css') }}">
+{% endblock %}
+
+{% block body %}
+<main>
+    <h1 class="titre">Offrir une cartes cadeaux</h1>
+    <div class="formContent">
+    <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
+        <form class="form-container-payment">
+            <p>Montant : {{ gift.count }} €</p>
+            <p>Email : {{ gift.email }}</p>
+        <button id="payButton" class="btn">Payer</button>
+        </form>
+    <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
+</main>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    var stripe = Stripe('{{ stripe_public_key }}');
+    var payButton = document.getElementById('payButton');
+    if (payButton) {
+        payButton.addEventListener('click', function () {
+            console.log('Bouton cliqué');
+            fetch('/gift/payment/{{ gift.id }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la création de la session Stripe');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Données retournées par le serveur :', data);
+                if (data.id) {
+                    stripe.redirectToCheckout({ sessionId: data.id });
+                } else {
+                    alert('Erreur : ID de session manquant.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    } else {
+        console.error('Bouton payButton introuvable dans le DOM.');
+    }
+});
+</script>
+
+{% endblock %}

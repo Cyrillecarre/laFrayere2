@@ -17,9 +17,23 @@
         <li>Date de départ: {{ end }}</li>
         <li>Pellets: {{ pellets }}</li>
         <li>Graines: {{ graines }}</li>
-        <li>Acompte: {{ is_deposit }} EUR</li>
+        {% if is_deposit > 0 %}
+            <li>Acompte: {{ is_deposit }} EUR</li>
+        {% else %}
+            <li>Acompte: Aucun</li>
+        {% endif %}
+        <li>Montant de la carte cadeau : {{ giftValue }} EUR</li>
         <li>Montant total: {{ totalPrice }} EUR</li>
+        {% set restant_a_payer = totalPrice - giftValue - is_deposit %}
+        {% if restant_a_payer > 0 %}
+            <li>Restant à payer: {{ restant_a_payer }} EUR</li>
+        {% endif %}
+        {% if remainingGiftValue > 0 %}
+            <li>Montant restant sur la carte cadeau : {{ remainingGiftValue }} EUR</li>
+        {% else %}
+            <li>La carte cadeau a été entièrement utilisée.</li>
+        {% endif %}
     </ul>
-    <p>Merci pour votre réservation.</p>
+    <p>Merci pour votre réservation. Pensez à consulter le réglement intérieur dans l'onglet "Réglementation"</p>
     </div>
 {% endblock %}

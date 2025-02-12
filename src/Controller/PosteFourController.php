@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Service\PricingService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Repository\GiftRepository;
 
 #[Route('/poste/four')]
 class PosteFourController extends AbstractController
@@ -34,7 +35,7 @@ class PosteFourController extends AbstractController
     }
 
     #[Route('/new', name: 'app_poste_four_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteFourRepository $posteFourRepository, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteFourRepository $posteFourRepository, SessionInterface $session, GiftRepository $giftRepository): Response
     {
         if ($session->has('reservation_details')) {
             $session->remove('reservation_details');
@@ -69,6 +70,7 @@ class PosteFourController extends AbstractController
             } else {
                 return $this->redirectToRoute('app_poste_four_error');
             }
+
             $overlappingEvents = $posteFourRepository->findOverlappingEvents($start, $end);
 
             if (count($overlappingEvents) > 0) {
@@ -79,20 +81,42 @@ class PosteFourController extends AbstractController
                 $numFishers = $form->get('numberOfFishers')->getData();
                 $pellets = $form->get('pellets')->getData();
                 $graines = $form->get('graines')->getData();
+                $giftCode = $form->get('giftCode')->getData();
                 
                 try {
                     $totalPrice = $this->pricingService->calculatePrice($numNights, $numFishers, [
                         'pellets' => $pellets,
                         'graines' => $graines
                     ]);
+
+                    $giftValue = 0;
+                    $totalPriceAfter = $totalPrice;
+
+                    if ($giftCode) {
+                        // Vérification du code promo
+                        $gift = $giftRepository->findOneBy(['code' => $giftCode]);
+                        if ($gift && $gift->getCount() > 0) {
+                            $giftValue = $gift->getCount();
+                            $totalPriceAfter = max(0, $totalPrice - $giftValue);
+                        } else {
+                            $this->addFlash('error', 'Code promo invalide ou déjà utilisé.');
+                            return $this->redirectToRoute('app_poste_one_new');
+                        }
+                    }
+
                 } catch (\InvalidArgumentException $e) {
                     return $this->redirectToRoute('app_poste_four_error');
+                }
+                if (!isset($totalPriceAfter)) {
+                    $totalPriceAfter = $totalPrice;
                 }
 
                 $session->set('reservation_details', [
                     'posteId' => $posteFour->getId(),
                     'poste_title' => 'Poste 4',
                     'poste_type' => 'quatre',
+                    'giftCode' => $giftCode,
+                    'giftValue' => $giftValue,
                     'start' => $posteFour->getStart()->format('Y-m-d'),
                     'end' => $posteFour->getEnd()->format('Y-m-d'),
                     'numberOfFishers' => $form->get('numberOfFishers')->getData(),
@@ -100,6 +124,8 @@ class PosteFourController extends AbstractController
                     'graines' => $form->get('graines')->getData(),
                     'email' => $form->get('email')->getData(),
                     'phoneNumber' => $form->get('phoneNumber')->getData(),
+                    'totalPrice' => $totalPrice,
+                    'totalPriceAfter' => $totalPriceAfter,
                 ]);
                 
                 return $this->redirectToRoute('app_poste_four_prix', [
@@ -111,7 +137,10 @@ class PosteFourController extends AbstractController
                     'poste_id' => $posteFour->getId(),
                     'poste_type' => 'quatre',
                     'start' => $posteFour->getStart()->format('Y-m-d'),
-                    'end' => $posteFour->getEnd()->format('Y-m-d')
+                    'end' => $posteFour->getEnd()->format('Y-m-d'),
+                    'giftCode' => $giftCode,
+                    'giftValue' => $giftValue,
+                    'totalPriceAfter' => $totalPriceAfter,
                 ]);
             }
         }
@@ -123,10 +152,10 @@ class PosteFourController extends AbstractController
     }
 
     #[Route('/prix', name: 'app_poste_four_prix', methods: ['GET'])]
-    public function summary(Request $request): Response
+    public function summary(Request $request, SessionInterface $session): Response
     {
         $stripePublicKey = $this->getParameter('stripe_public_key');
-        $totalPrice = $request->query->get('totalPrice');
+        $totalPrice = (float) $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
         $numFishers = $request->query->get('numFishers');
         $pellets = $request->query->get('pellets');
@@ -135,9 +164,16 @@ class PosteFourController extends AbstractController
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
         $end = \DateTime::createFromFormat('Y-m-d', $request->query->get('end'));
+        $totalPriceAfter = $request->query->get('totalPriceAfter', $totalPrice);
+
+        // Récupérer les détails de réservation dans la session
+        $reservationDetails = $session->get('reservation_details', []);
+        $giftCode = $reservationDetails['giftCode'] ?? null;
+        $giftValue = $reservationDetails['giftValue'] ?? 0;
 
         return $this->render('poste_four/prix.html.twig', [
             'totalPrice' => $totalPrice,
+            'totalPriceAfter' => $totalPriceAfter,
             'numNights' => $numNights,
             'numFishers' => $numFishers,
             'pellets' => $pellets,
@@ -147,6 +183,8 @@ class PosteFourController extends AbstractController
             'poste_type' => $posteType,
             'start' => $start->format('d-m'),
             'end' => $end->format('d-m'),
+            'giftCode' => $giftCode,
+            'giftValue' => $giftValue,
         ]);
     }
 

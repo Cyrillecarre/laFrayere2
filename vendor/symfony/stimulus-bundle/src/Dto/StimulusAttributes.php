@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -15,6 +13,7 @@ namespace Symfony\UX\StimulusBundle\Dto;
 
 use Twig\Environment;
 use Twig\Extension\EscaperExtension;
+use Twig\Runtime\EscaperRuntime;
 
 /**
  * Helper to build Stimulus-related HTML attributes.
@@ -137,16 +136,16 @@ class StimulusAttributes implements \Stringable, \IteratorAggregate
         $attributes = [];
 
         if ($controllers) {
-            $attributes[] = sprintf('data-controller="%s"', implode(' ', $controllers));
+            $attributes[] = \sprintf('data-controller="%s"', implode(' ', $controllers));
         }
 
         if ($actions) {
-            $attributes[] = sprintf('data-action="%s"', implode(' ', $actions));
+            $attributes[] = \sprintf('data-action="%s"', implode(' ', $actions));
         }
 
         if ($targets) {
             $attributes[] = implode(' ', array_map(function (string $key, string $value): string {
-                return sprintf('%s="%s"', $key, $value);
+                return \sprintf('%s="%s"', $key, $value);
             }, array_keys($targets), $targets));
         }
 
@@ -215,6 +214,10 @@ class StimulusAttributes implements \Stringable, \IteratorAggregate
 
     private function escapeAsHtmlAttr(mixed $value): string
     {
+        if (class_exists(EscaperRuntime::class)) {
+            return $this->env->getRuntime(EscaperRuntime::class)->escape($value, 'html_attr');
+        }
+
         if (method_exists(EscaperExtension::class, 'escape')) {
             return EscaperExtension::escape($this->env, $value, 'html_attr');
         }

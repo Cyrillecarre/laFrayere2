@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PricingService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Repository\GiftRepository;
 
 #[Route('/poste/two')]
 class PosteTwoController extends AbstractController
@@ -34,7 +35,7 @@ class PosteTwoController extends AbstractController
     }
 
     #[Route('/new', name: 'app_poste_two_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteTwoRepository $posteTwoRepository, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteTwoRepository $posteTwoRepository, SessionInterface $session, GiftRepository $giftRepository): Response
     {
         if ($session->has('reservation_details')) {
             $session->remove('reservation_details');
@@ -80,20 +81,43 @@ class PosteTwoController extends AbstractController
                 $numFishers = $form->get('numberOfFishers')->getData();
                 $pellets = $form->get('pellets')->getData();
                 $graines = $form->get('graines')->getData();
+                $giftCode = $form->get('giftCode')->getData();
                 
                 try {
                     $totalPrice = $this->pricingService->calculatePrice($numNights, $numFishers, [
                         'pellets' => $pellets,
                         'graines' => $graines
                     ]);
+
+                    $giftValue = 0;
+                    $totalPriceAfter = $totalPrice;
+
+                    if ($giftCode) {
+                        // Vérification du code promo
+                        $gift = $giftRepository->findOneBy(['code' => $giftCode]);
+                        if ($gift && $gift->getCount() > 0) {
+                            $giftValue = $gift->getCount();
+                            $totalPriceAfter = max(0, $totalPrice - $giftValue);
+                        } else {
+                            $this->addFlash('error', 'Code promo invalide ou déjà utilisé.');
+                            return $this->redirectToRoute('app_poste_one_new');
+                        }
+                    }
+
                 } catch (\InvalidArgumentException $e) {
                     return $this->redirectToRoute('app_poste_two_error');
                 }
+                if (!isset($totalPriceAfter)) {
+                    $totalPriceAfter = $totalPrice;
+                }
+
 
                 $session->set('reservation_details', [
                     'posteId' => $posteTwo->getId(),
                     'poste_title' => 'Poste 2',
                     'poste_type' => 'deux',
+                    'giftCode' => $giftCode,
+                    'giftValue' => $giftValue,
                     'start' => $posteTwo->getStart()->format('Y-m-d'),
                     'end' => $posteTwo->getEnd()->format('Y-m-d'),
                     'numberOfFishers' => $form->get('numberOfFishers')->getData(),
@@ -101,6 +125,8 @@ class PosteTwoController extends AbstractController
                     'graines' => $form->get('graines')->getData(),
                     'email' => $form->get('email')->getData(),
                     'phoneNumber' => $form->get('phoneNumber')->getData(),
+                    'totalPrice' => $totalPrice,
+                    'totalPriceAfter' => $totalPriceAfter,
                 ]);
                 
                 return $this->redirectToRoute('app_poste_two_prix', [
@@ -112,7 +138,10 @@ class PosteTwoController extends AbstractController
                     'poste_id' => $posteTwo->getId(),
                     'poste_type' => 'deux',
                     'start' => $posteTwo->getStart()->format('Y-m-d'),
-                    'end' => $posteTwo->getEnd()->format('Y-m-d')
+                    'end' => $posteTwo->getEnd()->format('Y-m-d'),
+                    'giftCode' => $giftCode,
+                    'giftValue' => $giftValue,
+                    'totalPriceAfter' => $totalPriceAfter,
                 ]);
             }
         }
@@ -124,10 +153,10 @@ class PosteTwoController extends AbstractController
     }
 
     #[Route('/prix', name: 'app_poste_two_prix', methods: ['GET'])]
-    public function summary(Request $request): Response
+    public function summary(Request $request, SessionInterface $session): Response
     {
         $stripePublicKey = $this->getParameter('stripe_public_key');
-        $totalPrice = $request->query->get('totalPrice');
+        $totalPrice = (float) $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
         $numFishers = $request->query->get('numFishers');
         $pellets = $request->query->get('pellets');
@@ -136,9 +165,15 @@ class PosteTwoController extends AbstractController
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
         $end = \DateTime::createFromFormat('Y-m-d', $request->query->get('end'));
+        $totalPriceAfter = $request->query->get('totalPriceAfter',$totalPrice);
+
+        $reservationDetails = $session->get('reservation_details', []);
+        $giftCode = $reservationDetails['giftCode'] ?? null;
+        $giftValue = $reservationDetails['giftValue'] ?? 0;
 
         return $this->render('poste_two/prix.html.twig', [
             'totalPrice' => $totalPrice,
+            'totalPriceAfter' => $totalPriceAfter,
             'numNights' => $numNights,
             'numFishers' => $numFishers,
             'pellets' => $pellets,
@@ -148,6 +183,8 @@ class PosteTwoController extends AbstractController
             'poste_type' => $posteType,
             'start' => $start->format('d-m'),
             'end' => $end->format('d-m'),
+            'giftCode' => $giftCode,
+            'giftValue' => $giftValue,
         ]);
     }
 

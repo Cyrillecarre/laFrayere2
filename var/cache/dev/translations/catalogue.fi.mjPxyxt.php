@@ -114,6 +114,7 @@ $catalogue = new MessageCatalogue('fi', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'Tiedostopääte ({{ extension }}) on virheellinen. Sallitut tiedostopäätteet ovat: {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'Havaittu merkistö on virheellinen ({{ detected }}). Sallitut merkistöt ovat {{ encodings }}.',
     'This value is not a valid MAC address.' => 'Tämä arvo ei ole kelvollinen MAC-osoite.',
+    'This URL is missing a top-level domain.' => 'Tästä URL-osoitteesta puuttuu ylätason verkkotunnus.',
     'This form should not contain extra fields.' => 'Tämä lomake ei voi sisältää ylimääräisiä kenttiä.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'Ladattu tiedosto on liian iso. Ole hyvä ja lataa pienempi tiedosto.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'CSRF-tarkiste on virheellinen. Ole hyvä ja yritä lähettää lomake uudestaan.',
@@ -168,6 +169,7 @@ $catalogue = new MessageCatalogue('fi', array (
     'Too many failed login attempts, please try again later.' => 'Liian monta epäonnistunutta kirjautumisyritystä, yritä myöhemmin uudelleen.',
     'Invalid or expired login link.' => 'Virheellinen tai vanhentunut kirjautumislinkki.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Liian monta epäonnistunutta kirjautumisyritystä, yritä uudelleen %minutes% minuutin kuluttua.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Liian monta epäonnistunutta kirjautumisyritystä, yritä uudelleen %minutes% minuutin kuluttua.',
   ),
 ));
 
@@ -283,6 +285,13 @@ $catalogueEn = new MessageCatalogue('en', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
     'This value is not a valid MAC address.' => 'This value is not a valid MAC address.',
+    'This URL is missing a top-level domain.' => 'This URL is missing a top-level domain.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.',
+    'This value does not represent a valid week in the ISO 8601 format.' => 'This value does not represent a valid week in the ISO 8601 format.',
+    'This value is not a valid week.' => 'This value is not a valid week.',
+    'This value should not be before week "{{ min }}".' => 'This value should not be before week "{{ min }}".',
+    'This value should not be after week "{{ max }}".' => 'This value should not be after week "{{ max }}".',
     'This form should not contain extra fields.' => 'This form should not contain extra fields.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'The uploaded file was too large. Please try to upload a smaller file.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'The CSRF token is invalid. Please try to resubmit the form.',
@@ -337,6 +346,7 @@ $catalogueEn = new MessageCatalogue('en', array (
     'Too many failed login attempts, please try again later.' => 'Too many failed login attempts, please try again later.',
     'Invalid or expired login link.' => 'Invalid or expired login link.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Too many failed login attempts, please try again in %minutes% minute.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Too many failed login attempts, please try again in %minutes% minutes.',
   ),
 ));
 $catalogue->addFallbackCatalogue($catalogueEn);

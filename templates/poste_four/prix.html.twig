@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New PosteFour{% endblock %}
+{% block title %}Réservation Poste 4{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
@@ -33,12 +33,10 @@
         var pellets = document.querySelector('input[name="pellets"]').value;
         var graines = document.querySelector('input[name="graines"]').value;
         var posteType = document.querySelector('input[name="poste_type"]').value;
-
+        var giftValue = document.querySelector('input[name="giftValue"]').value || 0;
         var startDateStr = document.querySelector('input[name="start"]').value;
         var endDateStr = document.querySelector('input[name="end"]').value;
-
-        var start = startDateStr;
-        var end = endDateStr;
+        var totalPriceAfter = document.querySelector('input[name="totalPriceAfter"]').value;
 
         fetch("{{ path('app_payment_create') }}", {
             method: 'POST',
@@ -55,34 +53,36 @@
                 pellets: pellets,
                 graines: graines,
                 posteType: posteType,
-                start: start,
-                end: end
+                start: startDateStr,
+                end: endDateStr,
+                giftValue: giftValue,
+                totalPriceAfter: totalPriceAfter
             })
         })
-        .then(response => response.json())
-        .then(session => {
-            if (session.error) {
-                alert(session.error);
-            } else {
-                return stripe.redirectToCheckout({ sessionId: session.id });
+            .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erreur lors de la création de la session Stripe');
+                        }
+                        return response.json();
+                    })
+                    .then(session => {
+                        if (session.error) {
+                            alert(session.error);
+                        } else {
+                            return stripe.redirectToCheckout({ sessionId: session.id });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur :', error);
+                        alert('Une erreur est survenue. Veuillez réessayer.');
+                    });
             }
-        })
-        .then(result => {
-            if (result && result.error) {
-                alert(result.error.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
         });
-    }
-});
-
     </script>
 {% endblock %}
 
 {% block body %}
-    <hr class="hr">
+<main>
     <h1 class="titre">réservation Poste 4</h1>
 
     {% if totalPrice is not null %}
@@ -93,9 +93,13 @@
             <p>Nombre de nuits : {{ numNights }}</p>
             <p>Pellets : {{ pellets }}</p>
             <p>Graines : {{ graines }}</p>
+            <p>Code cadeau appliqué : {{ giftCode }}</p>
+            <p>Valeur du code cadeau : {{ giftValue|default(0) }} EUR</p>
             <p>Montant total : {{ totalPrice }} EUR</p>
+            <p>Montant restant à payer : {{ totalPriceAfter }} EUR</p>
         </div>
         <form action="{{ path('app_payment_create') }}" method="POST" class="formPrixButton">
+            <input type="hidden" name="totalPriceAfter" value="{{ totalPriceAfter }}">
             <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
             <input type="hidden" name="poste_id" value="{{ poste_id }}">
             <input type="hidden" name="numFishers" value="{{ numFishers }}">
@@ -105,12 +109,19 @@
             <input type="hidden" name="poste_type" value="{{ poste_type }}">
             <input type="hidden" name="start" value="{{ start }}">
             <input type="hidden" name="end" value="{{ end }}">
-            <div>
-                <button type="submit" id="checkout-button" class="btnAction">Régler la totalité</button>
-            </div>
-            <div>
-                <button type="submit" id="deposit-button" class="btnAction" data-is-deposit="true">Régler un acompte</button>
-            </div>
+            <input type="hidden" name="giftValue" value="{{ giftValue|default(0) }}">
+            {% if totalPriceAfter > 0 %}
+                    <div>
+                        <button type="button" id="checkout-button" class="btnAction">Régler la totalité</button>
+                    </div>
+                    <div>
+                        <button type="button" id="deposit-button" class="btnAction">Régler un acompte</button>
+                    </div>
+                {% else %}
+                    <div class="btnActionZero">
+                        <button type="button" id="checkout-button" class="btnAction">Valider la session</button>
+                    </div>
+                {% endif %}
             <p class="textPrix">Vous allez être redirigé vers la page de paiement sécurisé</p>
         </form>
         {% else %}
@@ -119,4 +130,5 @@
 
     <hr class="hr">
     <a href="{{ path('app_poste_four_new') }}" class="btnAction">Retour</a>
+</main>
 {% endblock %}

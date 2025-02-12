@@ -16,7 +16,7 @@ $catalogue = new MessageCatalogue('lv', array (
     'This field was not expected.' => 'Šis lauks netika gaidīts.',
     'This field is missing.' => 'Šis lauks ir pazudis.',
     'This value is not a valid date.' => 'Šī vērtība ir nederīgs datums.',
-    'This value is not a valid datetime.' => 'Šī vērtība ir nederīgs datums un laiks',
+    'This value is not a valid datetime.' => 'Šī vērtība ir nederīgs datums un laiks.',
     'This value is not a valid email address.' => 'Šī vērtība ir nederīga e-pasta adrese.',
     'The file could not be found.' => 'Fails nav atrasts.',
     'The file is not readable.' => 'Fails nav lasāms.',
@@ -114,6 +114,9 @@ $catalogue = new MessageCatalogue('lv', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'Faila paplašinājums nav derīgs ({{ extension }}). Atļautie paplašinājumi ir {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'Noteiktais rakstzīmju kodējums nav derīgs ({{ detected }}). Atļautie kodējumi ir {{ encodings }}.',
     'This value is not a valid MAC address.' => 'Šī vērtība nav derīga MAC adrese.',
+    'This URL is missing a top-level domain.' => 'Šim URL trūkst augšējā līmeņa domēna.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'Šī vērtība ir pārāk īsa. Tai būtu jābūt vismaz vienu vārdu garai.|Šī vērtība ir pārāk īsa. Tai būtu jābūt ne mazāk kā {{ min }} vārdus garai.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'Šī vērtība ir pārāk gara. Tai būtu jābūt vienam vārdam.|Šī vērtība ir pārāk gara. Tai būtu jābūt ne vairāk kā {{ max }} vārdus garai.',
     'This form should not contain extra fields.' => 'Šajā veidlapā nevajadzētu būt papildus ievades laukiem.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'Augšupielādētā faila izmērs bija par lielu. Lūdzu mēģiniet augšupielādēt mazāka izmēra failu.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'Dotais CSRF talons nav derīgs. Lūdzu mēģiniet vēlreiz iesniegt veidlapu.',
@@ -168,6 +171,7 @@ $catalogue = new MessageCatalogue('lv', array (
     'Too many failed login attempts, please try again later.' => 'Pārāk daudz atteiktu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz vēlāk.',
     'Invalid or expired login link.' => 'Autentifikācijas saite ir nederīga vai arī tai ir beidzies derīguma termiņš.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Pārāk daudz nesekmīgu autentifikācijas mēģinājumu, lūdzu mēģiniet vēlreiz pēc %minutes% minūtes.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Pārāk daudz neveiksmīgu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz pēc %minutes% minūtes.|Pārāk daudz neveiksmīgu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz pēc %minutes% minūtēm.',
   ),
 ));
 
@@ -283,6 +287,13 @@ $catalogueEn = new MessageCatalogue('en', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
     'This value is not a valid MAC address.' => 'This value is not a valid MAC address.',
+    'This URL is missing a top-level domain.' => 'This URL is missing a top-level domain.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.',
+    'This value does not represent a valid week in the ISO 8601 format.' => 'This value does not represent a valid week in the ISO 8601 format.',
+    'This value is not a valid week.' => 'This value is not a valid week.',
+    'This value should not be before week "{{ min }}".' => 'This value should not be before week "{{ min }}".',
+    'This value should not be after week "{{ max }}".' => 'This value should not be after week "{{ max }}".',
     'This form should not contain extra fields.' => 'This form should not contain extra fields.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'The uploaded file was too large. Please try to upload a smaller file.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'The CSRF token is invalid. Please try to resubmit the form.',
@@ -337,6 +348,7 @@ $catalogueEn = new MessageCatalogue('en', array (
     'Too many failed login attempts, please try again later.' => 'Too many failed login attempts, please try again later.',
     'Invalid or expired login link.' => 'Invalid or expired login link.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Too many failed login attempts, please try again in %minutes% minute.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Too many failed login attempts, please try again in %minutes% minutes.',
   ),
 ));
 $catalogue->addFallbackCatalogue($catalogueEn);

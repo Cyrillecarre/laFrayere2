@@ -54,8 +54,6 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Yaml\Yaml;
 
-trigger_deprecation('symfony/maker-bundle', 'v1.59.0', 'The "%s" class is deprecated, use any of the Security\Make* commands instead.', MakeAuthenticator::class);
-
 /**
  * @deprecated since MakerBundle v1.59.0, use any of the Security/Make* instead.
  *
@@ -99,6 +97,8 @@ final class MakeAuthenticator extends AbstractMaker
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
+        trigger_deprecation('symfony/maker-bundle', 'v1.59.0', 'The "%s" class is deprecated, use any of the Security\Make* commands instead.', self::class);
+
         $io->caution('"make:auth" is deprecated, use any of the "make:security" commands instead.');
 
         if (!$this->fileManager->fileExists($path = 'config/packages/security.yaml')) {
@@ -377,7 +377,7 @@ final class MakeAuthenticator extends AbstractMaker
         }
 
         if (method_exists($controllerClassNameDetails->getFullName(), 'login')) {
-            throw new RuntimeCommandException(sprintf('Method "login" already exists on class %s', $controllerClassNameDetails->getFullName()));
+            throw new RuntimeCommandException(\sprintf('Method "login" already exists on class %s', $controllerClassNameDetails->getFullName()));
         }
 
         $manipulator = new ClassSourceManipulator(
@@ -428,10 +428,10 @@ final class MakeAuthenticator extends AbstractMaker
         }
 
         if (self::AUTH_TYPE_FORM_LOGIN === $authenticatorType) {
-            $nextTexts[] = sprintf('- Finish the redirect "TODO" in the <info>%s::onAuthenticationSuccess()</info> method.', $authenticatorClass);
+            $nextTexts[] = \sprintf('- Finish the redirect "TODO" in the <info>%s::onAuthenticationSuccess()</info> method.', $authenticatorClass);
 
             if (!$this->doctrineHelper->isClassAMappedEntity($userClass)) {
-                $nextTexts[] = sprintf('- Review <info>%s::getUser()</info> to make sure it matches your needs.', $authenticatorClass);
+                $nextTexts[] = \sprintf('- Review <info>%s::getUser()</info> to make sure it matches your needs.', $authenticatorClass);
             }
 
             $nextTexts[] = '- Review & adapt the login template: <info>'.$this->fileManager->getPathForTemplate('security/login.html.twig').'</info>.';

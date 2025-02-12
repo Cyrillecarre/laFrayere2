@@ -235,6 +235,10 @@
     width: 60%;
 }
 
+.hrFormGrid input {
+    height: 25px;
+}
+
 .hrForm {
     justify-content: center;
     align-items: center;
@@ -277,9 +281,23 @@
     gap: 1rem;
 }
 
+.btnActionZero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+    margin: 0 auto;
+    border-radius: 0.5rem;
+    width: 9rem;
+    height: 3rem;
+    grid-column: span 2 !important;
+}
+
 @media only screen and (max-width: 768px) {
 
     .titre {
+        margin-top:5rem;
         font-size: 2.5rem;
         text-align: center;
     }
@@ -319,7 +337,7 @@
     }
 
     .btnAction {
-        width: 4rem;
+        width: 7rem;
         height: 2.5rem;
         font-size: 0.7rem;
     }
@@ -335,6 +353,21 @@
 
     .formStart {
         width: 10rem;
+    }
+
+    .formPrix {
+        width: 90%;
+        border-radius: 1rem;
+    }
+
+    .formPrixPayment {
+        margin-top: 5rem;
+        width: 90%;
+        border-radius: 1rem;
+    }
+
+    .formPrixButton {
+        width: 80%;
     }
 
     .formEnd {

@@ -114,6 +114,7 @@ $catalogue = new MessageCatalogue('ar', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'امتداد الملف غير صحيح ({{ extension }}). الامتدادات المسموح بها هي {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'تم اكتشاف ترميز أحرف غير صالح ({{ detected }}). الترميزات المسموح بها هي {{ encodings }}.',
     'This value is not a valid MAC address.' => 'هذه القيمة ليست عنوان MAC صالحًا.',
+    'This URL is missing a top-level domain.' => 'هذا الرابط يفتقر إلى نطاق المستوى الأعلى.',
     'This form should not contain extra fields.' => 'هذا النموذج يجب الا يحتوى على اى حقول اضافية.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'مساحة الملف المرسل كبيرة. من فضلك حاول ارسال ملف اصغر.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'قيمة رمز الموقع غير صحيحة. من فضلك اعد ارسال النموذج.',
@@ -165,9 +166,10 @@ $catalogue = new MessageCatalogue('ar', array (
     'Credentials have expired.' => 'انتهت صلاحية معلومات الدخول.',
     'Account is disabled.' => 'الحساب موقوف.',
     'Account is locked.' => 'الحساب مغلق.',
-    'Too many failed login attempts, please try again later.' => 'عدد كبير جدا من محاولات الدخول الفاشلة، يرجى المحاولة مرة أخرى في وقت لاحق.',
+    'Too many failed login attempts, please try again later.' => 'العديد من محاولات الدخول الفاشلة، يرجى المحاولة مرة أخرى في وقت لاحق.',
     'Invalid or expired login link.' => 'رابط تسجيل الدخول غير صالح أو منتهي الصلاحية.',
-    'Too many failed login attempts, please try again in %minutes% minute.' => 'عدد كبير جدا من محاولات الدخول الفاشلة، يرجى اعادة المحاولة بعد %minutes% دقيقة.',
+    'Too many failed login attempts, please try again in %minutes% minute.' => 'العديد من محاولات الدخول الفاشلة، يرجى اعادة المحاولة بعد %minutes% دقيقة.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'العديد من محاولات الدخول الفاشلة ، يرجى اعادة المحاولة بعد %minutes% دقائق.',
   ),
 ));
 
@@ -283,6 +285,13 @@ $catalogueEn = new MessageCatalogue('en', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
     'This value is not a valid MAC address.' => 'This value is not a valid MAC address.',
+    'This URL is missing a top-level domain.' => 'This URL is missing a top-level domain.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.',
+    'This value does not represent a valid week in the ISO 8601 format.' => 'This value does not represent a valid week in the ISO 8601 format.',
+    'This value is not a valid week.' => 'This value is not a valid week.',
+    'This value should not be before week "{{ min }}".' => 'This value should not be before week "{{ min }}".',
+    'This value should not be after week "{{ max }}".' => 'This value should not be after week "{{ max }}".',
     'This form should not contain extra fields.' => 'This form should not contain extra fields.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'The uploaded file was too large. Please try to upload a smaller file.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'The CSRF token is invalid. Please try to resubmit the form.',
@@ -337,6 +346,7 @@ $catalogueEn = new MessageCatalogue('en', array (
     'Too many failed login attempts, please try again later.' => 'Too many failed login attempts, please try again later.',
     'Invalid or expired login link.' => 'Invalid or expired login link.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Too many failed login attempts, please try again in %minutes% minute.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Too many failed login attempts, please try again in %minutes% minutes.',
   ),
 ));
 $catalogue->addFallbackCatalogue($catalogueEn);

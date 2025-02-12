@@ -17,6 +17,9 @@ return [
         '/admin' => [[['_route' => 'app_admin', '_controller' => 'App\\Controller\\AdminController::index'], null, null, null, false, false, null]],
         '/contact' => [[['_route' => 'app_contact', '_controller' => 'App\\Controller\\ContactController::index'], null, null, null, false, false, null]],
         '/validation' => [[['_route' => 'app_validation', '_controller' => 'App\\Controller\\ContactController::emailEnvoye'], null, null, null, false, false, null]],
+        '/gift' => [[['_route' => 'app_gift', '_controller' => 'App\\Controller\\GiftController::index'], null, null, null, false, false, null]],
+        '/medaille' => [[['_route' => 'app_medaille_index', '_controller' => 'App\\Controller\\MedailleController::index'], null, ['GET' => 0], null, false, false, null]],
+        '/medaille/new' => [[['_route' => 'app_medaille_new', '_controller' => 'App\\Controller\\MedailleController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/reserve-all' => [[['_route' => 'app_reserve_all', '_controller' => 'App\\Controller\\MultiResaController::reserveAll'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/prix' => [[['_route' => 'app_multi_prix', '_controller' => 'App\\Controller\\MultiResaController::summary'], null, ['GET' => 0], null, false, false, null]],
         '/create-checkout-session' => [[['_route' => 'app_payment_create', '_controller' => 'App\\Controller\\PaymentController::createCheckoutSession'], null, ['POST' => 0], null, false, false, null]],
@@ -69,42 +72,55 @@ return [
                         .')'
                     .')'
                 .')'
+                .'|/gift/payment(?'
+                    .'|\\-page/([^/]++)(*:233)'
+                    .'|/(?'
+                        .'|([^/]++)(*:253)'
+                        .'|success/([^/]++)(*:277)'
+                        .'|cancel/([^/]++)(*:300)'
+                    .')'
+                .')'
+                .'|/medaille/([^/]++)(?'
+                    .'|(*:331)'
+                    .'|/edit(*:344)'
+                    .'|(*:352)'
+                .')'
                 .'|/poste/(?'
                     .'|four/([^/]++)(?'
-                        .'|(*:228)'
+                        .'|(*:387)'
                         .'|/(?'
-                            .'|approve(*:247)'
-                            .'|edit(*:259)'
+                            .'|approve(*:406)'
+                            .'|edit(*:418)'
                         .')'
-                        .'|(*:268)'
+                        .'|(*:427)'
                     .')'
                     .'|one/([^/]++)(?'
-                        .'|(*:292)'
+                        .'|(*:451)'
                         .'|/(?'
-                            .'|approve(*:311)'
-                            .'|edit(*:323)'
+                            .'|approve(*:470)'
+                            .'|edit(*:482)'
                         .')'
-                        .'|(*:332)'
+                        .'|(*:491)'
                     .')'
                     .'|t(?'
                         .'|hree/([^/]++)(?'
-                            .'|(*:361)'
+                            .'|(*:520)'
                             .'|/(?'
-                                .'|approve(*:380)'
-                                .'|edit(*:392)'
+                                .'|approve(*:539)'
+                                .'|edit(*:551)'
                             .')'
-                            .'|(*:401)'
+                            .'|(*:560)'
                         .')'
                         .'|wo/(?'
                             .'|([^/]++)(?'
-                                .'|(*:427)'
+                                .'|(*:586)'
                                 .'|/(?'
-                                    .'|approve(*:446)'
-                                    .'|edit(*:458)'
+                                    .'|approve(*:605)'
+                                    .'|edit(*:617)'
                                 .')'
-                                .'|(*:467)'
+                                .'|(*:626)'
                             .')'
-                            .'|poste/([^/]++)/cancel(*:497)'
+                            .'|poste/([^/]++)/cancel(*:656)'
                         .')'
                     .')'
                 .')'
@@ -119,23 +135,30 @@ return [
         168 => [[['_route' => '_profiler_exception', '_controller' => 'web_profiler.controller.exception_panel::body'], ['token'], null, null, false, false, null]],
         181 => [[['_route' => '_profiler_exception_css', '_controller' => 'web_profiler.controller.exception_panel::stylesheet'], ['token'], null, null, false, false, null]],
         191 => [[['_route' => '_profiler', '_controller' => 'web_profiler.controller.profiler::panelAction'], ['token'], null, null, false, true, null]],
-        228 => [[['_route' => 'app_poste_four_show', '_controller' => 'App\\Controller\\PosteFourController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        247 => [[['_route' => 'app_approve_reservation_four', '_controller' => 'App\\Controller\\PosteFourController::approveReservation'], ['id'], null, null, false, false, null]],
-        259 => [[['_route' => 'app_poste_four_edit', '_controller' => 'App\\Controller\\PosteFourController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        268 => [[['_route' => 'app_poste_four_delete', '_controller' => 'App\\Controller\\PosteFourController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        292 => [[['_route' => 'app_poste_one_show', '_controller' => 'App\\Controller\\PosteOneController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        311 => [[['_route' => 'app_approve_reservation_one', '_controller' => 'App\\Controller\\PosteOneController::approveReservation'], ['id'], null, null, false, false, null]],
-        323 => [[['_route' => 'app_poste_one_edit', '_controller' => 'App\\Controller\\PosteOneController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        332 => [[['_route' => 'app_poste_one_delete', '_controller' => 'App\\Controller\\PosteOneController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        361 => [[['_route' => 'app_poste_three_show', '_controller' => 'App\\Controller\\PosteThreeController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        380 => [[['_route' => 'app_approve_reservation_three', '_controller' => 'App\\Controller\\PosteThreeController::approveReservation'], ['id'], null, null, false, false, null]],
-        392 => [[['_route' => 'app_poste_three_edit', '_controller' => 'App\\Controller\\PosteThreeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        401 => [[['_route' => 'app_poste_three_delete', '_controller' => 'App\\Controller\\PosteThreeController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        427 => [[['_route' => 'app_poste_two_show', '_controller' => 'App\\Controller\\PosteTwoController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        446 => [[['_route' => 'app_approve_reservation_two', '_controller' => 'App\\Controller\\PosteTwoController::approveReservation'], ['id'], null, null, false, false, null]],
-        458 => [[['_route' => 'app_poste_two_edit', '_controller' => 'App\\Controller\\PosteTwoController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        467 => [[['_route' => 'app_poste_two_delete', '_controller' => 'App\\Controller\\PosteTwoController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        497 => [
+        233 => [[['_route' => 'app_gift_payment_page', '_controller' => 'App\\Controller\\GiftController::paymentPage'], ['id'], null, null, false, true, null]],
+        253 => [[['_route' => 'app_gift_payment', '_controller' => 'App\\Controller\\GiftController::payment'], ['id'], ['POST' => 0], null, false, true, null]],
+        277 => [[['_route' => 'app_gift_payment_success', '_controller' => 'App\\Controller\\GiftController::paymentSuccess'], ['id'], ['GET' => 0], null, false, true, null]],
+        300 => [[['_route' => 'app_gift_payment_cancel', '_controller' => 'App\\Controller\\GiftController::paymentCancel'], ['id'], ['GET' => 0], null, false, true, null]],
+        331 => [[['_route' => 'app_medaille_show', '_controller' => 'App\\Controller\\MedailleController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        344 => [[['_route' => 'app_medaille_edit', '_controller' => 'App\\Controller\\MedailleController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        352 => [[['_route' => 'app_medaille_delete', '_controller' => 'App\\Controller\\MedailleController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        387 => [[['_route' => 'app_poste_four_show', '_controller' => 'App\\Controller\\PosteFourController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        406 => [[['_route' => 'app_approve_reservation_four', '_controller' => 'App\\Controller\\PosteFourController::approveReservation'], ['id'], null, null, false, false, null]],
+        418 => [[['_route' => 'app_poste_four_edit', '_controller' => 'App\\Controller\\PosteFourController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        427 => [[['_route' => 'app_poste_four_delete', '_controller' => 'App\\Controller\\PosteFourController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        451 => [[['_route' => 'app_poste_one_show', '_controller' => 'App\\Controller\\PosteOneController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        470 => [[['_route' => 'app_approve_reservation_one', '_controller' => 'App\\Controller\\PosteOneController::approveReservation'], ['id'], null, null, false, false, null]],
+        482 => [[['_route' => 'app_poste_one_edit', '_controller' => 'App\\Controller\\PosteOneController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        491 => [[['_route' => 'app_poste_one_delete', '_controller' => 'App\\Controller\\PosteOneController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        520 => [[['_route' => 'app_poste_three_show', '_controller' => 'App\\Controller\\PosteThreeController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        539 => [[['_route' => 'app_approve_reservation_three', '_controller' => 'App\\Controller\\PosteThreeController::approveReservation'], ['id'], null, null, false, false, null]],
+        551 => [[['_route' => 'app_poste_three_edit', '_controller' => 'App\\Controller\\PosteThreeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        560 => [[['_route' => 'app_poste_three_delete', '_controller' => 'App\\Controller\\PosteThreeController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        586 => [[['_route' => 'app_poste_two_show', '_controller' => 'App\\Controller\\PosteTwoController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        605 => [[['_route' => 'app_approve_reservation_two', '_controller' => 'App\\Controller\\PosteTwoController::approveReservation'], ['id'], null, null, false, false, null]],
+        617 => [[['_route' => 'app_poste_two_edit', '_controller' => 'App\\Controller\\PosteTwoController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        626 => [[['_route' => 'app_poste_two_delete', '_controller' => 'App\\Controller\\PosteTwoController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        656 => [
             [['_route' => 'app_poste_one_cancel', '_controller' => 'App\\Controller\\PosteTwoController::cancel'], ['id'], ['DELETE' => 0], null, false, false, null],
             [null, null, null, null, false, false, 0],
         ],

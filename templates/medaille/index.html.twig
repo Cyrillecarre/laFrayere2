@@ -1,0 +1,211 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/honneur.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/medaille.js') }}"></script>
+{% endblock %}
+
+{% block title %}Medaille index{% endblock %}
+
+{% block body %}
+    <h1 class="titre">Tableau d'honneur</h1>
+    <hr class="hr">
+    <h2 class="titre2">Commune</h2>
+    <table class="table">
+        <tbody class="tableContent">
+        <tr>
+            {% set medailleOr = medailles|filter(m => m.category == 'Or' and m.type == 'Commune')|first %}
+            {% set medailleArgent = medailles|filter(m => m.category == 'Argent' and m.type == 'Commune')|first %}
+            {% set medailleBronze = medailles|filter(m => m.category == 'Bronze' and m.type == 'Commune')|first %}
+
+            <td class="tableContent2">
+                {% if medailleArgent %}
+                    <p class="medaille">&#x1F948</p>
+                    {% if medailleArgent.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleArgent.picture) }}" alt="{{ medailleArgent.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleArgent.name }}</p>
+                    <p>{{ medailleArgent.date ? medailleArgent.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleArgent.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleArgent.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleArgent.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+
+            <td class="tableContent2">
+                {% if medailleOr %}
+                    <p class="medaille">&#x1F3C5</p>
+                    {% if medailleOr.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleOr.picture) }}" alt="{{ medailleOr.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleOr.name }}</p>
+                    <p>{{ medailleOr.date ? medailleOr.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleOr.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleOr.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleOr.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+
+            <td class="tableContent2">
+                {% if medailleBronze %}
+                    <p class="medaille">&#x1F949</p>
+                    {% if medailleBronze.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleBronze.picture) }}" alt="{{ medailleBronze.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleBronze.name }}</p>
+                    <p>{{ medailleBronze.date ? medailleBronze.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleBronze.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleBronze.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleBronze.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr class="hr">
+    <h2 class="titre2">Miroir</h2>
+    <table class="table">
+        <tbody class="tableContent">
+        <tr>
+            {% set medailleOr = medailles|filter(m => m.category == 'Or' and m.type == 'Miroir')|first %}
+            {% set medailleArgent = medailles|filter(m => m.category == 'Argent' and m.type == 'Miroir')|first %}
+            {% set medailleBronze = medailles|filter(m => m.category == 'Bronze' and m.type == 'Miroir')|first %}
+
+            <td class="tableContent2">
+                {% if medailleArgent %}
+                    <p class="medaille">&#x1F948</p>
+                    {% if medailleArgent.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleArgent.picture) }}" alt="{{ medailleArgent.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleArgent.name }}</p>
+                    <p>{{ medailleArgent.date ? medailleArgent.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleArgent.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleArgent.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleArgent.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+            <td class="tableContent2">
+                {% if medailleOr %}
+                    <p class="medaille">&#x1F3C5</p>
+                    {% if medailleOr.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleOr.picture) }}" alt="{{ medailleOr.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleOr.name }}</p>
+                    <p>{{ medailleOr.date ? medailleOr.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleOr.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleOr.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleOr.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+
+            <td class="tableContent2">
+                {% if medailleBronze %}
+                    <p class="medaille">&#x1F949</p>
+                    {% if medailleBronze.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleBronze.picture) }}" alt="{{ medailleBronze.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleBronze.name }}</p>
+                    <p>{{ medailleBronze.date ? medailleBronze.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleBronze.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleBronze.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleBronze.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr class="hr">
+    <h2 class="titre2">Koï</h2>
+    <table class="table">
+        <tbody class="tableContent">
+        <tr>
+            {% set medailleOr = medailles|filter(m => m.category == 'Or' and m.type == 'Koï')|first %}
+            {% set medailleArgent = medailles|filter(m => m.category == 'Argent' and m.type == 'Koï')|first %}
+            {% set medailleBronze = medailles|filter(m => m.category == 'Bronze' and m.type == 'Koï')|first %}
+
+            <td class="tableContent2">
+                {% if medailleArgent %}
+                    <p class="medaille">&#x1F948</p>
+                    {% if medailleArgent.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleArgent.picture) }}" alt="{{ medailleArgent.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleArgent.name }}</p>
+                    <p>{{ medailleArgent.date ? medailleArgent.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleArgent.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleArgent.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleArgent.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+
+            <td class="tableContent2">
+                {% if medailleOr %}
+                    <p class="medaille">&#x1F3C5</p>
+                    {% if medailleOr.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleOr.picture) }}" alt="{{ medailleOr.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleOr.name }}</p>
+                    <p>{{ medailleOr.date ? medailleOr.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleOr.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleOr.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleOr.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+
+            <td class="tableContent2">
+                {% if medailleBronze %}
+                    <p class="medaille">&#x1F949</p>
+                    {% if medailleBronze.picture %}
+                        <img class="responsive-image" src="{{ asset('uploads/medailles/' ~ medailleBronze.picture) }}" alt="{{ medailleBronze.name }}" style="max-width: 500px; max-height: 500px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                    <p>{{ medailleBronze.name }}</p>
+                    <p>{{ medailleBronze.date ? medailleBronze.date|date('d-m-Y') : '' }}</p>
+                    <p>{{ medailleBronze.weight }} kg</p>
+                    <a href="{{ path('app_medaille_show', {'id': medailleBronze.id}) }}">show</a>
+                    <a href="{{ path('app_medaille_edit', {'id': medailleBronze.id}) }}">edit</a>
+                {% else %}
+                    <p>No medal</p>
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+        <hr class="hr">
+{% endblock %}

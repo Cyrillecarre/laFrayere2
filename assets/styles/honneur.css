@@ -1,0 +1,95 @@
+.table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.titre {
+    display: flex;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    margin-top: 2rem;
+}
+
+.titre2 {
+    display: flex;
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 2rem;
+}
+
+.tableContent {
+    display: flex;
+    flex: 1 1 500px;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+.tableContent2 p a {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    align-items: center;
+}
+
+.tableContent2 {
+    padding: 0.3rem;
+}
+
+.medaille {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-size: 10rem;
+    margin: 0;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+img.responsive-image {
+    width: 100%;
+    height: auto;
+    display: block; 
+    margin: 0 auto;
+    object-fit: cover;
+}
+.hr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 60%;
+    height: 0.2rem;
+    background-color:rgb(5, 123, 84);
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
+
+@media (max-width: 768px) {
+    .medaille {
+        font-size: 4rem;
+    }
+
+    .tableContent2 {
+        flex: 1 1 100%; /* Chaque colonne prend 100% sur les petits écrans */
+    }
+
+    img.responsive-image {
+        width: 80%; /* Réduit légèrement la taille de l'image sur les petits écrans */
+    }
+}

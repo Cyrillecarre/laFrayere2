@@ -114,6 +114,13 @@ $catalogue = new MessageCatalogue('pl', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'Rozszerzenie pliku jest nieprawidłowe ({{ extension }}). Dozwolone rozszerzenia to {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'Wykryte kodowanie znaków ({{ detected }}) jest nieprawidłowe. Dozwolone kodowania to {{ encodings }}.',
     'This value is not a valid MAC address.' => 'Ta wartość nie jest prawidłowym adresem MAC.',
+    'This URL is missing a top-level domain.' => 'Podany URL nie zawiera domeny najwyższego poziomu.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'Podana wartość jest zbyt krótka. Powinna zawierać co najmniej jedno słowo.|Podana wartość jest zbyt krótka. Powinna zawierać co najmniej {{ min }} słów.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'Podana wartość jest zbyt długa. Powinna zawierać jedno słowo.|Podana wartość jest zbyt długa. Powinna zawierać {{ max }} słów lub mniej.',
+    'This value does not represent a valid week in the ISO 8601 format.' => 'Podana wartość nie jest poprawnym oznaczeniem tygodnia w formacie ISO 8601.',
+    'This value is not a valid week.' => 'Podana wartość nie jest poprawnym oznaczeniem tygodnia.',
+    'This value should not be before week "{{ min }}".' => 'Podana wartość nie powinna być przed tygodniem "{{ min }}".',
+    'This value should not be after week "{{ max }}".' => 'Podana wartość nie powinna być po tygodniu "{{ max }}".',
     'This form should not contain extra fields.' => 'Ten formularz nie powinien zawierać dodatkowych pól.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'Wgrany plik był za duży. Proszę spróbować wgrać mniejszy plik.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'Token CSRF jest nieprawidłowy. Proszę spróbować wysłać formularz ponownie.',
@@ -168,6 +175,7 @@ $catalogue = new MessageCatalogue('pl', array (
     'Too many failed login attempts, please try again later.' => 'Zbyt dużo nieudanych prób logowania, proszę spróbować ponownie później.',
     'Invalid or expired login link.' => 'Nieprawidłowy lub wygasły link logowania.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Zbyt wiele nieudanych prób logowania, spróbuj ponownie po upływie %minutes% minut.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Zbyt wiele nieudanych prób logowania, spróbuj ponownie za %minutes% minutę.|Zbyt wiele nieudanych prób logowania, spróbuj ponownie za %minutes% minuty.|Zbyt wiele nieudanych prób logowania, spróbuj ponownie za %minutes% minut.',
   ),
 ));
 
@@ -283,6 +291,13 @@ $catalogueEn = new MessageCatalogue('en', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
     'This value is not a valid MAC address.' => 'This value is not a valid MAC address.',
+    'This URL is missing a top-level domain.' => 'This URL is missing a top-level domain.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.',
+    'This value does not represent a valid week in the ISO 8601 format.' => 'This value does not represent a valid week in the ISO 8601 format.',
+    'This value is not a valid week.' => 'This value is not a valid week.',
+    'This value should not be before week "{{ min }}".' => 'This value should not be before week "{{ min }}".',
+    'This value should not be after week "{{ max }}".' => 'This value should not be after week "{{ max }}".',
     'This form should not contain extra fields.' => 'This form should not contain extra fields.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'The uploaded file was too large. Please try to upload a smaller file.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'The CSRF token is invalid. Please try to resubmit the form.',
@@ -337,6 +352,7 @@ $catalogueEn = new MessageCatalogue('en', array (
     'Too many failed login attempts, please try again later.' => 'Too many failed login attempts, please try again later.',
     'Invalid or expired login link.' => 'Invalid or expired login link.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Too many failed login attempts, please try again in %minutes% minute.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Too many failed login attempts, please try again in %minutes% minutes.',
   ),
 ));
 $catalogue->addFallbackCatalogue($catalogueEn);

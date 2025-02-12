@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement Réussi{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/gift.css') }}">
+{% endblock %}
+
+{% block body %}
+<main>
+    <h1 class="titre">Merci pour votre achat ! Votre code promo est :</h1>
+    <div class="formContent">
+        <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
+        <div class="form-container-payment">
+            <div class="form-group">
+                <h2 class="titre">{{ uniqueCode }}</h2>
+                <p>Concervez ce code précieusement !</p>
+                <p>Vous pouvez l'utiliser dès maintenant.</p>
+                <p>{{ count }}€ ont été ajoutés à votre compte.</p>
+                <p>Le code vous a été envoyé par email à {{ userEmail }}</p>
+            </div>
+        </div>
+        <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
+    </div>
+</main>
+{% endblock %}

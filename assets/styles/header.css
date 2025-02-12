@@ -173,6 +173,7 @@ mask-image:
         flex-direction: column;
         width: 100%;
         margin: 0 auto;
+        padding-top: 1.7rem;
         flex-grow: 1;
         align-items: center;
         background-color: rgba(166, 163, 163, 0.8);

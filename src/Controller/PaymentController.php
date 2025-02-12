@@ -20,6 +20,7 @@ use App\Entity\PosteFour;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Repository\GiftRepository;
 
 class PaymentController extends AbstractController
 {
@@ -50,7 +51,8 @@ class PaymentController extends AbstractController
             if (!isset($data['totalPrice']) || !isset($data['isDeposit']) || !isset($data['posteId']) || !isset($data['posteType']) || !isset($data['start']) || !isset($data['end'])) {
                 throw new \Exception("Données requises à l'entree manquantes.");
             }
-    
+            
+            $totalPriceAfter = (float) $data['totalPriceAfter'];
             $totalPrice = (float) $data['totalPrice'];
             $isDeposit = (bool) $data['isDeposit'];
             $posteId = $data['posteId'];
@@ -58,6 +60,7 @@ class PaymentController extends AbstractController
             $currentYear = date('Y');
             $startDateTime = \DateTime::createFromFormat('d-m-Y', $data['start'] . '-' . $currentYear);
             $endDateTime = \DateTime::createFromFormat('d-m-Y', $data['end'] . '-' . $currentYear);
+            
 
             if (!$startDateTime || !$endDateTime) {
                 throw new \Exception("Erreur lors du parsing des dates.");
@@ -68,10 +71,10 @@ class PaymentController extends AbstractController
 
 
             if ($isDeposit) {
-                $depositAmount = $totalPrice * 0.30;
+                $depositAmount = $totalPriceAfter * 0.30;
                 $amountToCharge = ceil($depositAmount / 10) * 10; // Arrondir à la dizaine supérieure
             } else {
-                $amountToCharge = $totalPrice;
+                $amountToCharge = $totalPriceAfter;
             }
     
             $amountToChargeCents = $amountToCharge * 100;
@@ -94,12 +97,15 @@ class PaymentController extends AbstractController
                 'success_url' => $this->generateUrl('app_payment_success', [
                     'poste_id' => $posteId, 
                     'poste_type' => $posteType, 
-                    'totalPrice' => $totalPrice, 
+                    'totalPriceAfter' => $totalPriceAfter,
+                    'totalPrice' => $totalPrice,
                     'is_deposit' => $amountToCharge, 
                     'start' => $startDateTime->format('d-m-Y'),
                     'end' => $endDateTime->format('d-m-Y'),
                     'pellets' => $pellets, 
-                    'graines' => $graines
+                    'graines' => $graines,
+                    'giftCode' => $data['giftCode'] ?? null,
+                    'giftValue' => $data['giftValue'] ?? 0,
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
                 'cancel_url' => $this->generateUrl('app_payment_cancel', [
                     'poste_id' => $posteId, 
@@ -108,12 +114,15 @@ class PaymentController extends AbstractController
                 'metadata' => [
                     'poste_id' => $posteId,
                     'poste_type' => $posteType,
+                    'totalPriceAfter' => $totalPriceAfter,
                     'totalPrice' => $totalPrice,
                     'is_deposit' => $amountToCharge,
                     'start' => $startDateTime->format('d-m-Y'),
                     'end' => $endDateTime->format('d-m-Y'),
                     'pellets' => $pellets,
                     'graines' => $graines,
+                    'giftCode' => $data['giftCode'] ?? null,
+                    'giftValue' => $data['giftValue'] ?? 0,
                 ],
             ]);
     
@@ -126,22 +135,57 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/payment-success', name: 'app_payment_success')]
-    public function paymentSuccess(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    public function paymentSuccess(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session, GiftRepository $giftRepository): Response
     {
         $reservationDetails = $session->get('reservation_details');
         if (!$reservationDetails) {
             throw $this->createNotFoundException('Détails de la réservation non trouvés dans la session.');
         }
+        $remainingGiftValue = 0;
 
+        $giftValue = (float)($reservationDetails['giftValue'] ?? 0);
+        $giftCode = $reservationDetails['giftCode'] ?? null;
+
+        $totalPrice = (float) $request->query->get('totalPrice');
+        
+        if ($giftCode && $giftValue > 0) {
+            $gift = $giftRepository->findOneBy(['code' => $giftCode]);
+        
+            if ($gift) {
+                $currentGiftValue = $gift->getCount();
+                $remainingGiftValue = $currentGiftValue - $totalPrice;
+        
+                if ($remainingGiftValue >= 0) {
+                    // Si la carte cadeau couvre entièrement le montant
+                    $gift->setCount($remainingGiftValue); // Mettre à jour le solde de la carte cadeau
+                    $totalPrice = 0; // Rien à payer après utilisation de la carte cadeau
+                } else {
+                    // Si la carte cadeau est insuffisante
+                    $totalPrice -= $currentGiftValue; // Le montant restant à payer
+                    $gift->setCount(0); // Épuiser le solde de la carte cadeau
+                }
+        
+                // Persister les modifications
+                $this->entityManager->persist($gift);
+                $this->entityManager->flush();
+            } else {
+                $remainingGiftValue = 0;
+            }
+        }
+        
+
+        
+        
         $posteTitle = $reservationDetails['poste_title'];
-        $totalPrice = $request->query->get('totalPrice');
+        $totalPriceAfter = $request->query->get('totalPriceAfter');
+        $totalPrice= $request->query->get('totalPrice');
         $isDeposit = $request->query->get('is_deposit');
         $posteType = $reservationDetails['poste_type'];
         $startDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['start']);
         $endDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['end']);
         $numberOfFishers = $reservationDetails['numberOfFishers'];
-        $pellets = $reservationDetails['pellets'];
-        $graines = $reservationDetails['graines'];
+        $pellets = $request->query->get('pellets');
+        $graines = $request->query->get('graines');
         $email = $reservationDetails['email'];
         $phoneNumber = $reservationDetails['phoneNumber'];
 
@@ -176,6 +220,8 @@ class PaymentController extends AbstractController
             $this->entityManager->persist($newPoste);
             $this->entityManager->flush();
 
+        $isDeposit = (float)$request->query->get('is_deposit');
+
         $email = (new Email())
             ->from('la.frayere@la-frayere.fr')
             ->to('la.frayere@la-frayere.fr')
@@ -184,12 +230,15 @@ class PaymentController extends AbstractController
                 'posteType' => $posteType,
                 'start' => $startDateTime->format('d-m'),
                 'end' => $endDateTime->format('d-m'),
+                'totalPriceAfter' => $totalPriceAfter,
                 'totalPrice' => $totalPrice,
+                'giftValue' => $giftValue,
                 'is_deposit' => $isDeposit,
                 'pellets' => $pellets,
                 'graines' => $graines,
                 'email' => $email,
                 'phoneNumber' => $phoneNumber,
+                'remainingGiftValue' => $remainingGiftValue,
             ]));
 
         $mailer->send($email);
@@ -200,10 +249,13 @@ class PaymentController extends AbstractController
                 'posteType' => $posteType,
                 'start' => $startDateTime->format('d-m'),
                 'end' => $endDateTime->format('d-m'),
+                'totalPriceAfter' => $totalPriceAfter,
                 'totalPrice' => $totalPrice,
                 'is_deposit' => $isDeposit,
                 'pellets' => $pellets,
                 'graines' => $graines,
+                'giftValue' => $giftValue,
+                'remainingGiftValue' => $remainingGiftValue,
             ]);
     }
 

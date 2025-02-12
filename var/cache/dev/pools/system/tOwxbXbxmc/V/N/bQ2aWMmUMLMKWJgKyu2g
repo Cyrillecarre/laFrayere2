@@ -1,0 +1,3 @@
+<?php //58ee7b4823784f7a04bdf48b566cadd8
+
+return [PHP_INT_MAX, 'styles/error.css'];

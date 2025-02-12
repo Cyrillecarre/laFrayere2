@@ -114,6 +114,7 @@ $catalogue = new MessageCatalogue('nb', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'Filutvidelsen er ugyldig ({{ extension }}). Tillatte utvidelser er {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'Den oppdagede tegnkodingen er ugyldig ({{ detected }}). Tillatte kodinger er {{ encodings }}.',
     'This value is not a valid MAC address.' => 'Denne verdien er ikke en gyldig MAC-adresse.',
+    'This URL is missing a top-level domain.' => 'Denne URL-en mangler et toppnivådomene.',
     'This form should not contain extra fields.' => 'Feltgruppen må ikke inneholde ekstra felter.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'Den opplastede filen var for stor. Vennligst last opp en mindre fil.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'CSRF-tokenen er ugyldig. Vennligst prøv å sende inn skjemaet på nytt.',
@@ -168,6 +169,7 @@ $catalogue = new MessageCatalogue('nb', array (
     'Too many failed login attempts, please try again later.' => 'For mange mislykkede påloggingsforsøk. Prøv igjen senere.',
     'Invalid or expired login link.' => 'Ugyldig eller utløpt påloggingskobling.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'For mange mislykkede påloggingsforsøk, prøv igjen om %minutes% minutt.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'For mange mislykkede påloggingsforsøk, prøv igjen om %minutes% minutter.',
   ),
 ));
 
@@ -283,6 +285,7 @@ $catalogueNo = new MessageCatalogue('no', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'Filutvidelsen er ugyldig ({{ extension }}). Tillatte utvidelser er {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'Den oppdagede tegnkodingen er ugyldig ({{ detected }}). Tillatte kodinger er {{ encodings }}.',
     'This value is not a valid MAC address.' => 'Denne verdien er ikke en gyldig MAC-adresse.',
+    'This URL is missing a top-level domain.' => 'Denne URL-en mangler et toppnivådomene.',
     'This form should not contain extra fields.' => 'Feltgruppen må ikke inneholde ekstra felter.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'Den opplastede filen var for stor. Vennligst last opp en mindre fil.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'CSRF-tokenen er ugyldig. Vennligst prøv å sende inn skjemaet på nytt.',
@@ -337,6 +340,7 @@ $catalogueNo = new MessageCatalogue('no', array (
     'Too many failed login attempts, please try again later.' => 'For mange mislykkede påloggingsforsøk. Prøv igjen senere.',
     'Invalid or expired login link.' => 'Ugyldig eller utløpt påloggingskobling.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'For mange mislykkede påloggingsforsøk, prøv igjen om %minutes% minutt.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'For mange mislykkede påloggingsforsøk, prøv igjen om %minutes% minutter.',
   ),
 ));
 $catalogue->addFallbackCatalogue($catalogueNo);
@@ -452,6 +456,13 @@ $catalogueEn = new MessageCatalogue('en', array (
     'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.' => 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.',
     'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.' => 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
     'This value is not a valid MAC address.' => 'This value is not a valid MAC address.',
+    'This URL is missing a top-level domain.' => 'This URL is missing a top-level domain.',
+    'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.' => 'This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.',
+    'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.' => 'This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.',
+    'This value does not represent a valid week in the ISO 8601 format.' => 'This value does not represent a valid week in the ISO 8601 format.',
+    'This value is not a valid week.' => 'This value is not a valid week.',
+    'This value should not be before week "{{ min }}".' => 'This value should not be before week "{{ min }}".',
+    'This value should not be after week "{{ max }}".' => 'This value should not be after week "{{ max }}".',
     'This form should not contain extra fields.' => 'This form should not contain extra fields.',
     'The uploaded file was too large. Please try to upload a smaller file.' => 'The uploaded file was too large. Please try to upload a smaller file.',
     'The CSRF token is invalid. Please try to resubmit the form.' => 'The CSRF token is invalid. Please try to resubmit the form.',
@@ -506,6 +517,7 @@ $catalogueEn = new MessageCatalogue('en', array (
     'Too many failed login attempts, please try again later.' => 'Too many failed login attempts, please try again later.',
     'Invalid or expired login link.' => 'Invalid or expired login link.',
     'Too many failed login attempts, please try again in %minutes% minute.' => 'Too many failed login attempts, please try again in %minutes% minute.',
+    'Too many failed login attempts, please try again in %minutes% minutes.' => 'Too many failed login attempts, please try again in %minutes% minutes.',
   ),
 ));
 $catalogueNo->addFallbackCatalogue($catalogueEn);

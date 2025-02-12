@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello GiftController!{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/gift.css') }}">
+{% endblock %}
+
+
+{% block body %}
+
+<main>
+    <h1 class="titre">Offrir une cartes cadeaux</h1>
+    <div class="formContent">
+        <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
+            {{ form_start(form, {'attr': {'class': 'form-container'}}) }}
+                <div class="form-group">
+                    <label for="{{ form.email.vars.id }}" class="form-label">Email</label>
+                    {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Entrez votre email'}}) }}
+                    {{ form_errors(form.email) }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.count.vars.id }}" class="form-label">Montant</label>
+                    {{ form_widget(form.count, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.count) }}
+                </div>
+                
+                <button type="submit" class="btn">Envoyer</button>
+                <p>L'email est indispensable pour recevoir le code de la carte cadeau</p>
+                <p>Le montant pourra être utilisé en une ou plusieurs fois suivant le montant</p>
+            {{ form_end(form) }}
+        <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
+    </div>
+</main>
+
+
+{% endblock %}

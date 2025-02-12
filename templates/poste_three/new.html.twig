@@ -66,6 +66,10 @@
         <div class="hrFormGrid">
             <hr class="hrForm">
         </div>
+        <div class="hrFormGrid">
+            <p class="hrText">Code cadeau ?</p>
+            {{ form_widget(form.giftCode, {'attr': {'class': 'formCode'}}) }}
+        </div>
         <button class="btnAction">{{ button_label|default('Combien ça coûte?') }}</button>
     {{ form_end(form) }}
 

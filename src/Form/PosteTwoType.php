@@ -90,7 +90,12 @@ class PosteTwoType extends AbstractType
                         'message' => 'Le format du numéro doit être 0612345678',
                     ]),
                 ],
-            ]);
+            ])
+            ->add('giftCode', TextType::class, [
+                'required' => false,
+                'mapped' => false,
+                'attr' => ['placeholder' => 'Entrez un code cadeau'],
+            ])
         ;
     }
 

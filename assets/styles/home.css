@@ -5,6 +5,32 @@
     height: auto;
     margin: 0 auto;
 }
+.gift {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    height: auto;
+    margin-top: 2rem;
+    font-style: italic;
+}
+
+.gift a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    font-size: 2rem;
+    font-weight: bold;
+    gap: 1rem;   
+}
+
+.gift img {
+    display: flex;
+    width: 100px;
+    height: auto;
+}
 
 .titre {
     display: flex;
@@ -130,13 +156,18 @@
 
 .couleurEtoile {
     display: flex;
+    flex-direction: column;
+    list-style: none;
     justify-content: center;
-    align-items: center;
-    gap: 1rem; 
+    align-items: center; 
     width: 80%; 
     margin: 0 auto;
     font-size: 1rem;
     margin-top: 3.5rem;
+}
+
+.couleurEtoile ul {
+    list-style: none;
 }
 
 .couleurOne {
@@ -306,6 +337,10 @@
         margin: 1rem auto 1rem auto;
         grid-column: span 2;
         border: 1px solid rgb(5, 123, 84);
+    }
+
+    .gift {
+        margin-top: 5rem;
     }
 
 }

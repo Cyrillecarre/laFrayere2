@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PricingService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Repository\GiftRepository;
+
 
 #[Route('/poste/one')]
 class PosteOneController extends AbstractController
@@ -34,7 +36,7 @@ class PosteOneController extends AbstractController
     }
 
     #[Route('/new', name: 'app_poste_one_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PosteOneRepository $posteOneRepository, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PosteOneRepository $posteOneRepository, SessionInterface $session, GiftRepository $giftRepository): Response
     {
         if ($session->has('reservation_details')) {
             $session->remove('reservation_details');
@@ -80,20 +82,45 @@ class PosteOneController extends AbstractController
                 $numFishers = $form->get('numberOfFishers')->getData();
                 $pellets = $form->get('pellets')->getData();
                 $graines = $form->get('graines')->getData();
+                $giftCode = $form->get('giftCode')->getData();
+                
                 
                 try {
                     $totalPrice = $this->pricingService->calculatePrice($numNights, $numFishers, [
                         'pellets' => $pellets,
                         'graines' => $graines
                     ]);
+
+                    $giftValue = 0;
+                    $totalPriceAfter = $totalPrice;
+
+                    if ($giftCode) {
+                        // Vérification du code promo
+                        $gift = $giftRepository->findOneBy(['code' => $giftCode]);
+                        if ($gift && $gift->getCount() > 0) {
+                            $giftValue = $gift->getCount();
+                            $totalPriceAfter = max(0, $totalPrice - $giftValue);
+                        } else {
+                            $this->addFlash('error', 'Code promo invalide ou déjà utilisé.');
+                            return $this->redirectToRoute('app_poste_one_new');
+                        }
+                    }
+
                 } catch (\InvalidArgumentException $e) {
                     return $this->redirectToRoute('app_poste_one_error');
                 }
+                if (!isset($totalPriceAfter)) {
+                    $totalPriceAfter = $totalPrice;
+                }
+
+               
 
                 $session->set('reservation_details', [
                     'posteId' => $posteOne->getId(),
                     'poste_title' => 'Poste 1',
                     'poste_type' => 'un',
+                    'giftCode' => $giftCode,
+                    'giftValue' => $giftValue,
                     'start' => $posteOne->getStart()->format('Y-m-d'),
                     'end' => $posteOne->getEnd()->format('Y-m-d'),
                     'numberOfFishers' => $form->get('numberOfFishers')->getData(),
@@ -101,6 +128,8 @@ class PosteOneController extends AbstractController
                     'graines' => $form->get('graines')->getData(),
                     'email' => $form->get('email')->getData(),
                     'phoneNumber' => $form->get('phoneNumber')->getData(),
+                    'totalPrice' => $totalPrice,
+                    'totalPriceAfter' => $totalPriceAfter,
                 ]);
                 
                 return $this->redirectToRoute('app_poste_one_prix', [
@@ -112,8 +141,10 @@ class PosteOneController extends AbstractController
                     'poste_id' => $posteOne->getId(),
                     'poste_type' => 'un',
                     'start' => $posteOne->getStart()->format('Y-m-d'),
-                    'end' => $posteOne->getEnd()->format('Y-m-d')
-
+                    'end' => $posteOne->getEnd()->format('Y-m-d'),
+                    'giftCode' => $giftCode,
+                    'giftValue' => $giftValue,
+                    'totalPriceAfter' => $totalPriceAfter,
                 ]);
             }
         }
@@ -124,11 +155,12 @@ class PosteOneController extends AbstractController
         ]);
     }
 
+
     #[Route('/prix', name: 'app_poste_one_prix', methods: ['GET'])]
-    public function summary(Request $request): Response
+    public function summary(Request $request, SessionInterface $session): Response
     {
         $stripePublicKey = $this->getParameter('stripe_public_key');
-        $totalPrice = $request->query->get('totalPrice');
+        $totalPrice = (float) $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
         $numFishers = $request->query->get('numFishers');
         $pellets = $request->query->get('pellets');
@@ -137,10 +169,17 @@ class PosteOneController extends AbstractController
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
         $end = \DateTime::createFromFormat('Y-m-d', $request->query->get('end'));
+        $totalPriceAfter = $request->query->get('totalPriceAfter', $totalPrice);
+
+        // Récupérer les détails de réservation dans la session
+        $reservationDetails = $session->get('reservation_details', []);
+        $giftCode = $reservationDetails['giftCode'] ?? null;
+        $giftValue = $reservationDetails['giftValue'] ?? 0;
 
 
         return $this->render('poste_one/prix.html.twig', [
             'totalPrice' => $totalPrice,
+            'totalPriceAfter' => $totalPriceAfter,
             'numNights' => $numNights,
             'numFishers' => $numFishers,
             'pellets' => $pellets,
@@ -150,8 +189,11 @@ class PosteOneController extends AbstractController
             'poste_type' => $posteType,
             'start' => $start->format('d-m'),
             'end' => $end->format('d-m'),
+            'giftCode' => $giftCode,
+            'giftValue' => $giftValue,
         ]);
     }
+
 
     #[Route('/poste/one/error', name: 'app_poste_one_error', methods: ['GET'])]
     public function error(): Response
@@ -204,6 +246,5 @@ class PosteOneController extends AbstractController
 
         return $this->redirectToRoute('app_admin', [], Response::HTTP_SEE_OTHER);
     }
-
 }
 
