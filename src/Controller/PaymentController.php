@@ -173,9 +173,6 @@ class PaymentController extends AbstractController
             }
         }
         
-
-        
-        
         $posteTitle = $reservationDetails['poste_title'];
         $totalPriceAfter = $request->query->get('totalPriceAfter');
         $totalPrice= $request->query->get('totalPrice');
@@ -210,39 +207,49 @@ class PaymentController extends AbstractController
                 throw new \Exception('Type de poste invalide.');
         }
 
+        $posteClass = get_class($newPoste);
 
-        $newPoste->setTitle($posteTitle);
-        $newPoste->setStart($startDateTime);
-        $newPoste->setEnd($endDateTime);
-        $newPoste->setemail($email);
-        $newPoste->setPhoneNumber($phoneNumber);
-        $newPoste->setApprouved(true);
-            $this->entityManager->persist($newPoste);
-            $this->entityManager->flush();
+        $existingPoste = $entityManager->getRepository($posteClass)->findOneBy([
+            'title' => $posteTitle,
+            'start' => $startDateTime,
+            'end' => $endDateTime,
+        ]);
 
-        $isDeposit = (float)$request->query->get('is_deposit');
+        if (!$existingPoste) {
+            $newPoste->setTitle($posteTitle);
+            $newPoste->setStart($startDateTime);
+            $newPoste->setEnd($endDateTime);
+            $newPoste->setemail($email);
+            $newPoste->setPhoneNumber($phoneNumber);
+            $newPoste->setApprouved(true);
+                $this->entityManager->persist($newPoste);
+                $this->entityManager->flush();
 
-        $email = (new Email())
-            ->from('la.frayere@la-frayere.fr')
-            ->to('la.frayere@la-frayere.fr')
-            ->subject('Confirmation de réservation')
-            ->html($this->renderView('payment/mailSuccess.html.twig', [
-                'posteType' => $posteType,
-                'start' => $startDateTime->format('d-m'),
-                'end' => $endDateTime->format('d-m'),
-                'totalPriceAfter' => $totalPriceAfter,
-                'totalPrice' => $totalPrice,
-                'giftValue' => $giftValue,
-                'is_deposit' => $isDeposit,
-                'pellets' => $pellets,
-                'graines' => $graines,
-                'email' => $email,
-                'phoneNumber' => $phoneNumber,
-                'remainingGiftValue' => $remainingGiftValue,
-            ]));
+            $isDeposit = (float)$request->query->get('is_deposit');
 
-        $mailer->send($email);
+            $emailMessage = (new Email())
+                ->from('la.frayere@la-frayere.fr')
+                ->to('la.frayere@la-frayere.fr')
+                ->subject('Confirmation de réservation')
+                ->html($this->renderView('payment/mailSuccess.html.twig', [
+                    'posteType' => $posteType,
+                    'start' => $startDateTime->format('d-m'),
+                    'end' => $endDateTime->format('d-m'),
+                    'totalPriceAfter' => $totalPriceAfter,
+                    'totalPrice' => $totalPrice,
+                    'giftValue' => $giftValue,
+                    'is_deposit' => $isDeposit,
+                    'pellets' => $pellets,
+                    'graines' => $graines,
+                    'email' => $email,
+                    'phoneNumber' => $phoneNumber,
+                    'remainingGiftValue' => $remainingGiftValue,
+                ]));
 
+            $mailer->send($emailMessage);
+        }
+
+        $session->remove('reservation_details');
 
             return $this->render('payment/success.html.twig', [
                 'stripe_public_key' => $this->getParameter('stripe_public_key'),
