@@ -225,6 +225,7 @@ class PosteOneController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $posteOne->setApprouved(true);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_poste_one_index', [], Response::HTTP_SEE_OTHER);

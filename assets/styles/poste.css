@@ -294,6 +294,10 @@
     grid-column: span 2 !important;
 }
 
+.editHidden {
+    display: none;
+}
+
 @media only screen and (max-width: 768px) {
 
     .titre {

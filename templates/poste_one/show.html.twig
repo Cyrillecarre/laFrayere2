@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block body %}
+<!-- show poste one -->
     <h1 class="titre">Poste 1</h1>
 
     <table class="table">
@@ -16,24 +17,24 @@
                 <th>Départ</th>
                 <th>Email</th>
                 <th>Tel</th>
-                <th>Validé</th>
                 <th>actions</th>
             </tr>
+        </thead>
         <tbody>
             <tr class="tableValeur">
                 <td>{{ poste_one.start ? poste_one.start|date('d-m-Y H:i:s') : '' }}</td>
                 <td>{{ poste_one.end ? poste_one.end|date('d-m-Y H:i:s') : '' }}</td>
                 <td>{{ poste_one.email }}</td>
                 <td>{{ poste_one.phoneNumber }}</td>
-                <td>{{ poste_one.isApprouved ? 'Oui' : 'Non' }}</td>
                 <td>
                     <a href="{{ path('app_poste_one_edit', {'id': poste_one.id}) }}" class="btnAction">modifier</a>
+                </td>
+                <td>
+                    {{ include('poste_one/_delete_form.html.twig') }}
                 </td>
             </tr>
         </tbody>
     </table>
-    <a href="{{ path('app_approve_reservation_one', {'id': poste_one.id}) }}" class="btnAction">Approuver</a>
-    {{ include('poste_one/_delete_form.html.twig') }}
     <a href="{{ path('app_poste_one_index') }}" class="btnAction" class="btnAction">Retour</a>
 
 {% endblock %}

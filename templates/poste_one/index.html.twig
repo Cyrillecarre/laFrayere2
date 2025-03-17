@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block body %}
+<!-- index -->
     <h1 class="titre">Poste 1</h1>
 
     <table class="table">
@@ -15,7 +16,6 @@
                 <th>Départ</th>
                 <th>Email</th>
                 <th>Tel</th>
-                <th>Validé</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -26,9 +26,8 @@
                 <td>{{ poste_one.end ? poste_one.end|date('d-m-Y H:i:s') : '' }}</td>
                 <td>{{ poste_one.email }}</td>
                 <td>{{ poste_one.phoneNumber }}</td>
-                <td>{{ poste_one.isApprouved ? 'Oui' : 'Non' }}</td>
                 <td>
-                    <a href="{{ path('app_poste_one_show', {'id': poste_one.id}) }}" class="btnAction">Voir</a>
+                    <a href="{{ path('app_poste_one_show', {'id': poste_one.id}) }}" class="btnAction">Modifier</a>
                 </td>
             </tr>
         {% else %}
