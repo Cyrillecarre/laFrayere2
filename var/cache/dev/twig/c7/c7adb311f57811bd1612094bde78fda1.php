@@ -174,6 +174,7 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
                     },
                     body: JSON.stringify({
                         totalPrice: totalPrice,
+                        totalPriceAfter: totalPriceAfter,
                         isDeposit: isDeposit,
                         posteId: posteId,
                         numFishers: numFishers,
@@ -184,7 +185,6 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
                         start: startDateStr,
                         end: endDateStr,
                         giftValue: giftValue,
-                        totalPriceAfter: totalPriceAfter
                     })
                 })
                     .then(response => {
@@ -328,25 +328,38 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
             // line 112
             yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("giftValue", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["giftValue"]) || array_key_exists("giftValue", $context) ? $context["giftValue"] : (function () { throw new RuntimeError('Variable "giftValue" does not exist.', 112, $this->source); })()), 0)) : (0)), "html", null, true);
             yield "\">
-                <div>
-                    <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Régler la totalité</button>
-                </div>
-                <div>
-                    <button type=\"button\" id=\"deposit-button\" class=\"btnAction\">Régler un acompte</button>
-                </div>
-                <p class=\"textPrix\">Vous allez être redirigé vers la page de paiement sécurisé</p>
+                ";
+            // line 113
+            if (((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 113, $this->source); })()) > 0)) {
+                // line 114
+                yield "                    <div>
+                        <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Régler la totalité</button>
+                    </div>
+                    <div>
+                        <button type=\"button\" id=\"deposit-button\" class=\"btnAction\">Régler un acompte</button>
+                    </div>
+                ";
+            } else {
+                // line 121
+                yield "                    <div class=\"btnActionZero\">
+                        <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Valider la session</button>
+                    </div>
+                ";
+            }
+            // line 125
+            yield "                <p class=\"textPrix\">Vous allez être redirigé vers la page de paiement sécurisé</p>
             </form>
         ";
         } else {
-            // line 122
+            // line 128
             yield "            <p class=\"textPrix\">Une erreur est survenue lors du calcul du montant total.</p>
         ";
         }
-        // line 124
+        // line 130
         yield "
         <hr class=\"hr\">
         <a href=\"";
-        // line 126
+        // line 132
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_poste_one_new");
         yield "\" class=\"btnAction\">Retour</a>
     </main>
@@ -381,7 +394,7 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  350 => 126,  346 => 124,  342 => 122,  329 => 112,  325 => 111,  321 => 110,  317 => 109,  313 => 108,  309 => 107,  305 => 106,  301 => 105,  297 => 104,  293 => 103,  289 => 102,  285 => 101,  280 => 99,  276 => 98,  272 => 97,  268 => 96,  264 => 95,  260 => 94,  256 => 93,  252 => 92,  248 => 91,  244 => 90,  241 => 89,  239 => 88,  234 => 85,  221 => 84,  172 => 45,  165 => 41,  134 => 13,  129 => 10,  116 => 9,  102 => 6,  89 => 5,  66 => 3,  43 => 1,);
+        return array (  363 => 132,  359 => 130,  355 => 128,  350 => 125,  344 => 121,  335 => 114,  333 => 113,  329 => 112,  325 => 111,  321 => 110,  317 => 109,  313 => 108,  309 => 107,  305 => 106,  301 => 105,  297 => 104,  293 => 103,  289 => 102,  285 => 101,  280 => 99,  276 => 98,  272 => 97,  268 => 96,  264 => 95,  260 => 94,  256 => 93,  252 => 92,  248 => 91,  244 => 90,  241 => 89,  239 => 88,  234 => 85,  221 => 84,  172 => 45,  165 => 41,  134 => 13,  129 => 10,  116 => 9,  102 => 6,  89 => 5,  66 => 3,  43 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -434,6 +447,7 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
                     },
                     body: JSON.stringify({
                         totalPrice: totalPrice,
+                        totalPriceAfter: totalPriceAfter,
                         isDeposit: isDeposit,
                         posteId: posteId,
                         numFishers: numFishers,
@@ -444,7 +458,6 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
                         start: startDateStr,
                         end: endDateStr,
                         giftValue: giftValue,
-                        totalPriceAfter: totalPriceAfter
                     })
                 })
                     .then(response => {
@@ -498,12 +511,18 @@ class __TwigTemplate_cd7c46da27f2f2ce9127b3dce7db86dc extends Template
                 <input type=\"hidden\" name=\"start\" value=\"{{ start }}\">
                 <input type=\"hidden\" name=\"end\" value=\"{{ end }}\">
                 <input type=\"hidden\" name=\"giftValue\" value=\"{{ giftValue|default(0) }}\">
-                <div>
-                    <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Régler la totalité</button>
-                </div>
-                <div>
-                    <button type=\"button\" id=\"deposit-button\" class=\"btnAction\">Régler un acompte</button>
-                </div>
+                {% if totalPriceAfter > 0 %}
+                    <div>
+                        <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Régler la totalité</button>
+                    </div>
+                    <div>
+                        <button type=\"button\" id=\"deposit-button\" class=\"btnAction\">Régler un acompte</button>
+                    </div>
+                {% else %}
+                    <div class=\"btnActionZero\">
+                        <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Valider la session</button>
+                    </div>
+                {% endif %}
                 <p class=\"textPrix\">Vous allez être redirigé vers la page de paiement sécurisé</p>
             </form>
         {% else %}

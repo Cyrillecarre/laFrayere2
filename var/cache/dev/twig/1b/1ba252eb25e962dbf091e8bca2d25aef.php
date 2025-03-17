@@ -160,31 +160,42 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
                 var endDateStr = document.querySelector('input[name=\"end\"]').value;
                 var totalPriceAfter = document.querySelector('input[name=\"totalPriceAfter\"]').value;
 
+                console.log('Données envoyées:', {
+                    totalPrice: totalPrice,
+                    totalPriceAfter: totalPriceAfter,
+                    isDeposit: isDeposit,
+                    posteId: posteId,
+                    posteType: posteType,
+                    start: startDateStr,
+                    end: endDateStr,
+                    pellets: pellets,
+                    graines: graines,
+                    giftValue: giftValue
+                });
+
                 fetch(\"";
-        // line 41
+        // line 54
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_payment_create");
         yield "\", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '";
-        // line 45
+        // line 58
         yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderCsrfToken("payment"), "html", null, true);
         yield "'
                     },
                     body: JSON.stringify({
                         totalPrice: totalPrice,
+                        totalPriceAfter: totalPriceAfter,
                         isDeposit: isDeposit,
                         posteId: posteId,
-                        numFishers: numFishers,
-                        numNights: numNights,
-                        pellets: pellets,
-                        graines: graines,
                         posteType: posteType,
                         start: startDateStr,
                         end: endDateStr,
-                        giftValue: giftValue,
-                        totalPriceAfter: totalPriceAfter
+                        pellets: pellets,
+                        graines: graines,
+                        giftValue: giftValue
                     })
                 })
                     .then(response => {
@@ -217,7 +228,7 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
         yield from [];
     }
 
-    // line 84
+    // line 95
     /**
      * @return iterable<null|scalar|\Stringable>
      */
@@ -230,108 +241,108 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_6f47bbe9983af81f1e7450e9a3e3768f->enter($__internal_6f47bbe9983af81f1e7450e9a3e3768f_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 85
+        // line 96
         yield "    <main>
     <h1 class=\"titre\">réservation Poste 2</h1>
 
     ";
-        // line 88
-        if ( !(null === (isset($context["totalPrice"]) || array_key_exists("totalPrice", $context) ? $context["totalPrice"] : (function () { throw new RuntimeError('Variable "totalPrice" does not exist.', 88, $this->source); })()))) {
-            // line 89
+        // line 99
+        if ( !(null === (isset($context["totalPrice"]) || array_key_exists("totalPrice", $context) ? $context["totalPrice"] : (function () { throw new RuntimeError('Variable "totalPrice" does not exist.', 99, $this->source); })()))) {
+            // line 100
             yield "        <div class=\"formPrix\">
             <p>Date d'arrivée : ";
-            // line 90
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["start"]) || array_key_exists("start", $context) ? $context["start"] : (function () { throw new RuntimeError('Variable "start" does not exist.', 90, $this->source); })()), "html", null, true);
+            // line 101
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["start"]) || array_key_exists("start", $context) ? $context["start"] : (function () { throw new RuntimeError('Variable "start" does not exist.', 101, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Date de départ : ";
-            // line 91
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["end"]) || array_key_exists("end", $context) ? $context["end"] : (function () { throw new RuntimeError('Variable "end" does not exist.', 91, $this->source); })()), "html", null, true);
+            // line 102
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["end"]) || array_key_exists("end", $context) ? $context["end"] : (function () { throw new RuntimeError('Variable "end" does not exist.', 102, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Nombre de pêcheurs : ";
-            // line 92
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numFishers"]) || array_key_exists("numFishers", $context) ? $context["numFishers"] : (function () { throw new RuntimeError('Variable "numFishers" does not exist.', 92, $this->source); })()), "html", null, true);
+            // line 103
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numFishers"]) || array_key_exists("numFishers", $context) ? $context["numFishers"] : (function () { throw new RuntimeError('Variable "numFishers" does not exist.', 103, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Nombre de nuits : ";
-            // line 93
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numNights"]) || array_key_exists("numNights", $context) ? $context["numNights"] : (function () { throw new RuntimeError('Variable "numNights" does not exist.', 93, $this->source); })()), "html", null, true);
+            // line 104
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numNights"]) || array_key_exists("numNights", $context) ? $context["numNights"] : (function () { throw new RuntimeError('Variable "numNights" does not exist.', 104, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Pellets : ";
-            // line 94
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["pellets"]) || array_key_exists("pellets", $context) ? $context["pellets"] : (function () { throw new RuntimeError('Variable "pellets" does not exist.', 94, $this->source); })()), "html", null, true);
+            // line 105
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["pellets"]) || array_key_exists("pellets", $context) ? $context["pellets"] : (function () { throw new RuntimeError('Variable "pellets" does not exist.', 105, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Graines : ";
-            // line 95
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["graines"]) || array_key_exists("graines", $context) ? $context["graines"] : (function () { throw new RuntimeError('Variable "graines" does not exist.', 95, $this->source); })()), "html", null, true);
+            // line 106
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["graines"]) || array_key_exists("graines", $context) ? $context["graines"] : (function () { throw new RuntimeError('Variable "graines" does not exist.', 106, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Code cadeau appliqué : ";
-            // line 96
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["giftCode"]) || array_key_exists("giftCode", $context) ? $context["giftCode"] : (function () { throw new RuntimeError('Variable "giftCode" does not exist.', 96, $this->source); })()), "html", null, true);
+            // line 107
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["giftCode"]) || array_key_exists("giftCode", $context) ? $context["giftCode"] : (function () { throw new RuntimeError('Variable "giftCode" does not exist.', 107, $this->source); })()), "html", null, true);
             yield "</p>
             <p>Valeur du code cadeau : ";
-            // line 97
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("giftValue", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["giftValue"]) || array_key_exists("giftValue", $context) ? $context["giftValue"] : (function () { throw new RuntimeError('Variable "giftValue" does not exist.', 97, $this->source); })()), 0)) : (0)), "html", null, true);
+            // line 108
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("giftValue", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["giftValue"]) || array_key_exists("giftValue", $context) ? $context["giftValue"] : (function () { throw new RuntimeError('Variable "giftValue" does not exist.', 108, $this->source); })()), 0)) : (0)), "html", null, true);
             yield " EUR</p>
             <p>Montant total : ";
-            // line 98
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPrice"]) || array_key_exists("totalPrice", $context) ? $context["totalPrice"] : (function () { throw new RuntimeError('Variable "totalPrice" does not exist.', 98, $this->source); })()), "html", null, true);
+            // line 109
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPrice"]) || array_key_exists("totalPrice", $context) ? $context["totalPrice"] : (function () { throw new RuntimeError('Variable "totalPrice" does not exist.', 109, $this->source); })()), "html", null, true);
             yield " EUR</p>
             <p>Montant restant à payer : ";
-            // line 99
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 99, $this->source); })()), "html", null, true);
+            // line 110
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 110, $this->source); })()), "html", null, true);
             yield " EUR</p>
         </div>
         <form action=\"";
-            // line 101
+            // line 112
             yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_payment_create");
             yield "\" method=\"POST\" class=\"formPrixButton\">
             <input type=\"hidden\" name=\"totalPriceAfter\" value=\"";
-            // line 102
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 102, $this->source); })()), "html", null, true);
+            // line 113
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 113, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"totalPrice\" value=\"";
-            // line 103
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPrice"]) || array_key_exists("totalPrice", $context) ? $context["totalPrice"] : (function () { throw new RuntimeError('Variable "totalPrice" does not exist.', 103, $this->source); })()), "html", null, true);
+            // line 114
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["totalPrice"]) || array_key_exists("totalPrice", $context) ? $context["totalPrice"] : (function () { throw new RuntimeError('Variable "totalPrice" does not exist.', 114, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"poste_id\" value=\"";
-            // line 104
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["poste_id"]) || array_key_exists("poste_id", $context) ? $context["poste_id"] : (function () { throw new RuntimeError('Variable "poste_id" does not exist.', 104, $this->source); })()), "html", null, true);
+            // line 115
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["poste_id"]) || array_key_exists("poste_id", $context) ? $context["poste_id"] : (function () { throw new RuntimeError('Variable "poste_id" does not exist.', 115, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"numFishers\" value=\"";
-            // line 105
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numFishers"]) || array_key_exists("numFishers", $context) ? $context["numFishers"] : (function () { throw new RuntimeError('Variable "numFishers" does not exist.', 105, $this->source); })()), "html", null, true);
+            // line 116
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numFishers"]) || array_key_exists("numFishers", $context) ? $context["numFishers"] : (function () { throw new RuntimeError('Variable "numFishers" does not exist.', 116, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"numNights\" value=\"";
-            // line 106
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numNights"]) || array_key_exists("numNights", $context) ? $context["numNights"] : (function () { throw new RuntimeError('Variable "numNights" does not exist.', 106, $this->source); })()), "html", null, true);
+            // line 117
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["numNights"]) || array_key_exists("numNights", $context) ? $context["numNights"] : (function () { throw new RuntimeError('Variable "numNights" does not exist.', 117, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"pellets\" value=\"";
-            // line 107
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["pellets"]) || array_key_exists("pellets", $context) ? $context["pellets"] : (function () { throw new RuntimeError('Variable "pellets" does not exist.', 107, $this->source); })()), "html", null, true);
+            // line 118
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["pellets"]) || array_key_exists("pellets", $context) ? $context["pellets"] : (function () { throw new RuntimeError('Variable "pellets" does not exist.', 118, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"graines\" value=\"";
-            // line 108
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["graines"]) || array_key_exists("graines", $context) ? $context["graines"] : (function () { throw new RuntimeError('Variable "graines" does not exist.', 108, $this->source); })()), "html", null, true);
+            // line 119
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["graines"]) || array_key_exists("graines", $context) ? $context["graines"] : (function () { throw new RuntimeError('Variable "graines" does not exist.', 119, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"poste_type\" value=\"";
-            // line 109
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["poste_type"]) || array_key_exists("poste_type", $context) ? $context["poste_type"] : (function () { throw new RuntimeError('Variable "poste_type" does not exist.', 109, $this->source); })()), "html", null, true);
+            // line 120
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["poste_type"]) || array_key_exists("poste_type", $context) ? $context["poste_type"] : (function () { throw new RuntimeError('Variable "poste_type" does not exist.', 120, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"start\" value=\"";
-            // line 110
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["start"]) || array_key_exists("start", $context) ? $context["start"] : (function () { throw new RuntimeError('Variable "start" does not exist.', 110, $this->source); })()), "html", null, true);
+            // line 121
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["start"]) || array_key_exists("start", $context) ? $context["start"] : (function () { throw new RuntimeError('Variable "start" does not exist.', 121, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"end\" value=\"";
-            // line 111
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["end"]) || array_key_exists("end", $context) ? $context["end"] : (function () { throw new RuntimeError('Variable "end" does not exist.', 111, $this->source); })()), "html", null, true);
+            // line 122
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape((isset($context["end"]) || array_key_exists("end", $context) ? $context["end"] : (function () { throw new RuntimeError('Variable "end" does not exist.', 122, $this->source); })()), "html", null, true);
             yield "\">
             <input type=\"hidden\" name=\"giftValue\" value=\"";
-            // line 112
-            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("giftValue", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["giftValue"]) || array_key_exists("giftValue", $context) ? $context["giftValue"] : (function () { throw new RuntimeError('Variable "giftValue" does not exist.', 112, $this->source); })()), 0)) : (0)), "html", null, true);
+            // line 123
+            yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(((array_key_exists("giftValue", $context)) ? (Twig\Extension\CoreExtension::default((isset($context["giftValue"]) || array_key_exists("giftValue", $context) ? $context["giftValue"] : (function () { throw new RuntimeError('Variable "giftValue" does not exist.', 123, $this->source); })()), 0)) : (0)), "html", null, true);
             yield "\">
             ";
-            // line 113
-            if (((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 113, $this->source); })()) > 0)) {
-                // line 114
+            // line 124
+            if (((isset($context["totalPriceAfter"]) || array_key_exists("totalPriceAfter", $context) ? $context["totalPriceAfter"] : (function () { throw new RuntimeError('Variable "totalPriceAfter" does not exist.', 124, $this->source); })()) > 0)) {
+                // line 125
                 yield "                    <div>
                         <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Régler la totalité</button>
                     </div>
@@ -340,26 +351,26 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
                     </div>
                 ";
             } else {
-                // line 121
+                // line 132
                 yield "                    <div class=\"btnActionZero\">
                         <button type=\"button\" id=\"checkout-button\" class=\"btnAction\">Valider la session</button>
                     </div>
                 ";
             }
-            // line 125
+            // line 136
             yield "            <p class=\"textPrix\">Vous allez être redirigé vers la page de paiement sécurisé</p>
         </form>
         ";
         } else {
-            // line 128
+            // line 139
             yield "            <p class=\"textPrix\">Une erreur est survenue lors du calcul du montant total.</p>
     ";
         }
-        // line 130
+        // line 141
         yield "
     <hr class=\"hr\">
     <a href=\"";
-        // line 132
+        // line 143
         yield $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("app_poste_two_new");
         yield "\" class=\"btnAction\">Retour</a>
 </main>
@@ -394,7 +405,7 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  363 => 132,  359 => 130,  355 => 128,  350 => 125,  344 => 121,  335 => 114,  333 => 113,  329 => 112,  325 => 111,  321 => 110,  317 => 109,  313 => 108,  309 => 107,  305 => 106,  301 => 105,  297 => 104,  293 => 103,  289 => 102,  285 => 101,  280 => 99,  276 => 98,  272 => 97,  268 => 96,  264 => 95,  260 => 94,  256 => 93,  252 => 92,  248 => 91,  244 => 90,  241 => 89,  239 => 88,  234 => 85,  221 => 84,  172 => 45,  165 => 41,  134 => 13,  129 => 10,  116 => 9,  102 => 6,  89 => 5,  66 => 3,  43 => 1,);
+        return array (  374 => 143,  370 => 141,  366 => 139,  361 => 136,  355 => 132,  346 => 125,  344 => 124,  340 => 123,  336 => 122,  332 => 121,  328 => 120,  324 => 119,  320 => 118,  316 => 117,  312 => 116,  308 => 115,  304 => 114,  300 => 113,  296 => 112,  291 => 110,  287 => 109,  283 => 108,  279 => 107,  275 => 106,  271 => 105,  267 => 104,  263 => 103,  259 => 102,  255 => 101,  252 => 100,  250 => 99,  245 => 96,  232 => 95,  185 => 58,  178 => 54,  134 => 13,  129 => 10,  116 => 9,  102 => 6,  89 => 5,  66 => 3,  43 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -439,6 +450,19 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
                 var endDateStr = document.querySelector('input[name=\"end\"]').value;
                 var totalPriceAfter = document.querySelector('input[name=\"totalPriceAfter\"]').value;
 
+                console.log('Données envoyées:', {
+                    totalPrice: totalPrice,
+                    totalPriceAfter: totalPriceAfter,
+                    isDeposit: isDeposit,
+                    posteId: posteId,
+                    posteType: posteType,
+                    start: startDateStr,
+                    end: endDateStr,
+                    pellets: pellets,
+                    graines: graines,
+                    giftValue: giftValue
+                });
+
                 fetch(\"{{ path('app_payment_create') }}\", {
                     method: 'POST',
                     headers: {
@@ -447,17 +471,15 @@ class __TwigTemplate_c5063657084558b1062712dccc7a1462 extends Template
                     },
                     body: JSON.stringify({
                         totalPrice: totalPrice,
+                        totalPriceAfter: totalPriceAfter,
                         isDeposit: isDeposit,
                         posteId: posteId,
-                        numFishers: numFishers,
-                        numNights: numNights,
-                        pellets: pellets,
-                        graines: graines,
                         posteType: posteType,
                         start: startDateStr,
                         end: endDateStr,
-                        giftValue: giftValue,
-                        totalPriceAfter: totalPriceAfter
+                        pellets: pellets,
+                        graines: graines,
+                        giftValue: giftValue
                     })
                 })
                     .then(response => {

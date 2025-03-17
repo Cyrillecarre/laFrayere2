@@ -46,10 +46,10 @@ class PaymentController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
-            error_log(print_r($data, true));
+            $this->logger->info('Données reçues:', $data);
  
-            if (!isset($data['totalPrice']) || !isset($data['isDeposit']) || !isset($data['posteId']) || !isset($data['posteType']) || !isset($data['start']) || !isset($data['end'])) {
-                throw new \Exception("Données requises à l'entree manquantes.");
+            if (!isset($data['totalPrice']) || !isset($data['isDeposit']) || !isset($data['posteId']) || !isset($data['posteType'])) {
+                throw new \Exception("Données requises manquantes.");
             }
             
             $totalPriceAfter = (float) $data['totalPriceAfter'];
@@ -57,22 +57,13 @@ class PaymentController extends AbstractController
             $isDeposit = (bool) $data['isDeposit'];
             $posteId = $data['posteId'];
             $posteType = $data['posteType'];
-            $currentYear = date('Y');
-            $startDateTime = \DateTime::createFromFormat('d-m-Y', $data['start'] . '-' . $currentYear);
-            $endDateTime = \DateTime::createFromFormat('d-m-Y', $data['end'] . '-' . $currentYear);
-            
-
-            if (!$startDateTime || !$endDateTime) {
-                throw new \Exception("Erreur lors du parsing des dates.");
-            }
-
             $pellets = $data['pellets'];
             $graines = $data['graines'];
-
+            $giftValue = $data['giftValue'] ?? 0;
 
             if ($isDeposit) {
                 $depositAmount = $totalPriceAfter * 0.30;
-                $amountToCharge = ceil($depositAmount / 10) * 10; // Arrondir à la dizaine supérieure
+                $amountToCharge = ceil($depositAmount / 10) * 10;
             } else {
                 $amountToCharge = $totalPriceAfter;
             }
@@ -100,36 +91,35 @@ class PaymentController extends AbstractController
                     'totalPriceAfter' => $totalPriceAfter,
                     'totalPrice' => $totalPrice,
                     'is_deposit' => $amountToCharge, 
-                    'start' => $startDateTime->format('d-m-Y'),
-                    'end' => $endDateTime->format('d-m-Y'),
                     'pellets' => $pellets, 
                     'graines' => $graines,
-                    'giftCode' => $data['giftCode'] ?? null,
-                    'giftValue' => $data['giftValue'] ?? 0,
+                    'giftValue' => $giftValue,
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
-                'cancel_url' => $this->generateUrl('app_payment_cancel', [
-                    'poste_id' => $posteId, 
-                    'poste_type' => $posteType
-                ], UrlGeneratorInterface::ABSOLUTE_URL),
+                'cancel_url' => $this->generateUrl('app_payment_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'metadata' => [
                     'poste_id' => $posteId,
                     'poste_type' => $posteType,
                     'totalPriceAfter' => $totalPriceAfter,
                     'totalPrice' => $totalPrice,
                     'is_deposit' => $amountToCharge,
-                    'start' => $startDateTime->format('d-m-Y'),
-                    'end' => $endDateTime->format('d-m-Y'),
                     'pellets' => $pellets,
                     'graines' => $graines,
-                    'giftCode' => $data['giftCode'] ?? null,
-                    'giftValue' => $data['giftValue'] ?? 0,
+                    'giftValue' => $giftValue,
                 ],
             ]);
     
+            $this->logger->info('Session Stripe créée avec succès', [
+                'session_id' => $stripeSession->id,
+                'success_url' => $stripeSession->success_url,
+            ]);
     
             return new JsonResponse(['id' => $stripeSession->id]);
     
         } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la création de la session:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
@@ -137,119 +127,130 @@ class PaymentController extends AbstractController
     #[Route('/payment-success', name: 'app_payment_success')]
     public function paymentSuccess(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session, GiftRepository $giftRepository): Response
     {
-        $reservationDetails = $session->get('reservation_details');
-        if (!$reservationDetails) {
-            throw $this->createNotFoundException('Détails de la réservation non trouvés dans la session.');
-        }
-        $remainingGiftValue = 0;
-
-        $giftValue = (float)($reservationDetails['giftValue'] ?? 0);
-        $giftCode = $reservationDetails['giftCode'] ?? null;
-
-        $totalPrice = (float) $request->query->get('totalPrice');
-        
-        if ($giftCode && $giftValue > 0) {
-            $gift = $giftRepository->findOneBy(['code' => $giftCode]);
-        
-            if ($gift) {
-                $currentGiftValue = $gift->getCount();
-                $remainingGiftValue = $currentGiftValue - $totalPrice;
-        
-                if ($remainingGiftValue >= 0) {
-                    // Si la carte cadeau couvre entièrement le montant
-                    $gift->setCount($remainingGiftValue); // Mettre à jour le solde de la carte cadeau
-                    $totalPrice = 0; // Rien à payer après utilisation de la carte cadeau
-                } else {
-                    // Si la carte cadeau est insuffisante
-                    $totalPrice -= $currentGiftValue; // Le montant restant à payer
-                    $gift->setCount(0); // Épuiser le solde de la carte cadeau
-                }
-        
-                // Persister les modifications
-                $this->entityManager->persist($gift);
-                $this->entityManager->flush();
-            } else {
-                $remainingGiftValue = 0;
-            }
-        }
-        
-        $posteTitle = $reservationDetails['poste_title'];
-        $totalPriceAfter = $request->query->get('totalPriceAfter');
-        $totalPrice= $request->query->get('totalPrice');
-        $isDeposit = $request->query->get('is_deposit');
-        $posteType = $reservationDetails['poste_type'];
-        $startDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['start']);
-        $endDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['end']);
-        $numberOfFishers = $reservationDetails['numberOfFishers'];
-        $pellets = $request->query->get('pellets');
-        $graines = $request->query->get('graines');
-        $email = $reservationDetails['email'];
-        $phoneNumber = $reservationDetails['phoneNumber'];
-
-        $startDateTime->setTime(14, 0);
-        $endDateTime->setTime(11, 0);
-
-        $newPoste = null;
-        switch ($posteType) {
-            case 'un':
-                $newPoste = new PosteOne();
-                break;
-            case 'deux':
-                $newPoste = new PosteTwo();
-                break;
-            case 'trois':
-                $newPoste = new PosteThree();
-                break;
-            case 'quatre':
-                $newPoste = new PosteFour();
-                break;
-            default:
-                throw new \Exception('Type de poste invalide.');
-        }
-
-        $posteClass = get_class($newPoste);
-
-        $existingPoste = $entityManager->getRepository($posteClass)->findOneBy([
-            'title' => $posteTitle,
-            'start' => $startDateTime,
-            'end' => $endDateTime,
+        $this->logger->info('Début de paymentSuccess', [
+            'query_params' => $request->query->all(),
+            'session_details' => $session->get('reservation_details')
         ]);
 
-        if (!$existingPoste) {
-            $newPoste->setTitle($posteTitle);
-            $newPoste->setStart($startDateTime);
-            $newPoste->setEnd($endDateTime);
-            $newPoste->setemail($email);
-            $newPoste->setPhoneNumber($phoneNumber);
-            $newPoste->setApprouved(true);
-                $this->entityManager->persist($newPoste);
-                $this->entityManager->flush();
+        try {
+            $reservationDetails = $session->get('reservation_details');
+            if (!$reservationDetails) {
+                $this->logger->error('Détails de réservation non trouvés dans la session');
+                throw $this->createNotFoundException('Détails de la réservation non trouvés dans la session.');
+            }
 
-            $isDeposit = (float)$request->query->get('is_deposit');
+            $remainingGiftValue = 0;
+            $giftValue = (float)($reservationDetails['giftValue'] ?? 0);
+            $giftCode = $reservationDetails['giftCode'] ?? null;
+            $posteTitle = $reservationDetails['poste_title'];
+            $totalPriceAfter = $request->query->get('totalPriceAfter');
+            $totalPrice = $request->query->get('totalPrice');
+            $isDeposit = $request->query->get('is_deposit');
+            $posteType = $reservationDetails['poste_type'];
+            $email = $reservationDetails['email'];
+            $phoneNumber = $reservationDetails['phoneNumber'];
+            $pellets = $request->query->get('pellets');
+            $graines = $request->query->get('graines');
 
-            $emailMessage = (new Email())
-                ->from('la.frayere@la-frayere.fr')
-                ->to('la.frayere@la-frayere.fr')
-                ->subject('Confirmation de réservation')
-                ->html($this->renderView('payment/mailSuccess.html.twig', [
-                    'posteType' => $posteType,
-                    'start' => $startDateTime->format('d-m'),
-                    'end' => $endDateTime->format('d-m'),
-                    'totalPriceAfter' => $totalPriceAfter,
-                    'totalPrice' => $totalPrice,
-                    'giftValue' => $giftValue,
-                    'is_deposit' => $isDeposit,
-                    'pellets' => $pellets,
-                    'graines' => $graines,
-                    'email' => $email,
-                    'phoneNumber' => $phoneNumber,
-                    'remainingGiftValue' => $remainingGiftValue,
-                ]));
+            // Utiliser les dates de la session au lieu des paramètres de requête
+            try {
+                $startDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['start']);
+                $endDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['end']);
 
-            $mailer->send($emailMessage);
-        }
+                if (!$startDateTime || !$endDateTime) {
+                    $this->logger->error('Format de date invalide dans la session', [
+                        'start' => $reservationDetails['start'],
+                        'end' => $reservationDetails['end']
+                    ]);
+                    throw new \Exception('Format de date invalide dans la session');
+                }
 
-        $session->remove('reservation_details');
+                $startDateTime->setTime(14, 0);
+                $endDateTime->setTime(11, 0);
+
+                $this->logger->info('Dates converties avec succès', [
+                    'start' => $startDateTime->format('Y-m-d H:i'),
+                    'end' => $endDateTime->format('Y-m-d H:i')
+                ]);
+            } catch (\Exception $e) {
+                $this->logger->error('Erreur conversion dates: ' . $e->getMessage());
+                throw $e;
+            }
+
+            // Création du poste
+            try {
+                $newPoste = null;
+                switch ($posteType) {
+                    case 'un':
+                        $newPoste = new PosteOne();
+                        break;
+                    case 'deux':
+                        $newPoste = new PosteTwo();
+                        break;
+                    case 'trois':
+                        $newPoste = new PosteThree();
+                        break;
+                    case 'quatre':
+                        $newPoste = new PosteFour();
+                        break;
+                    default:
+                        throw new \Exception('Type de poste invalide: ' . $posteType);
+                }
+
+                $this->logger->info('Création du poste', [
+                    'type' => $posteType,
+                    'title' => $posteTitle
+                ]);
+
+                $newPoste->setTitle($posteTitle);
+                $newPoste->setStart($startDateTime);
+                $newPoste->setEnd($endDateTime);
+                $newPoste->setEmail($email);
+                $newPoste->setPhoneNumber($phoneNumber);
+                $newPoste->setApprouved(true);
+
+                $entityManager->persist($newPoste);
+                $entityManager->flush();
+
+                $this->logger->info('Poste enregistré avec succès', [
+                    'id' => $newPoste->getId()
+                ]);
+
+                // Envoi de l'email
+                try {
+                    $emailMessage = (new Email())
+                        ->from('la.frayere@la-frayere.fr')
+                        ->to('la.frayere@la-frayere.fr')
+                        ->subject('Confirmation de réservation')
+                        ->html($this->renderView('payment/mailSuccess.html.twig', [
+                            'posteType' => $posteType,
+                            'start' => $startDateTime->format('d-m'),
+                            'end' => $endDateTime->format('d-m'),
+                            'totalPriceAfter' => $totalPriceAfter,
+                            'totalPrice' => $totalPrice,
+                            'giftValue' => $giftValue,
+                            'is_deposit' => $isDeposit,
+                            'pellets' => $pellets,
+                            'graines' => $graines,
+                            'email' => $email,
+                            'phoneNumber' => $phoneNumber,
+                            'remainingGiftValue' => $remainingGiftValue,
+                        ]));
+
+                    $mailer->send($emailMessage);
+                    $this->logger->info('Email envoyé avec succès');
+                } catch (\Exception $e) {
+                    $this->logger->error('Erreur envoi email: ' . $e->getMessage());
+                    // On ne relance pas l'erreur pour ne pas annuler la transaction
+                }
+
+            } catch (\Exception $e) {
+                $this->logger->error('Erreur création poste: ' . $e->getMessage());
+                throw $e;
+            }
+
+            // Nettoyage de la session
+            $session->remove('reservation_details');
 
             return $this->render('payment/success.html.twig', [
                 'stripe_public_key' => $this->getParameter('stripe_public_key'),
@@ -264,6 +265,11 @@ class PaymentController extends AbstractController
                 'giftValue' => $giftValue,
                 'remainingGiftValue' => $remainingGiftValue,
             ]);
+
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur générale: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     #[Route('/payment-cancel', name: 'app_payment_cancel')]
