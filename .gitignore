@@ -2,5 +2,6 @@
 .env
 .env.local
 .env.*.local
+/var/cache/
 
 backup.sql
