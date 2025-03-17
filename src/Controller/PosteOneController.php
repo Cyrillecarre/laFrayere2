@@ -11,28 +11,27 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PricingService;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\GiftRepository;
+use DateTime;
 
 
 #[Route('/poste/one')]
 class PosteOneController extends AbstractController
 {
-    #[Route('/', name: 'app_poste_one_index', methods: ['GET'])]
-    public function index(PosteOneRepository $posteOneRepository): Response
-    {
-        return $this->render('poste_one/index.html.twig', [
-            'poste_ones' => $posteOneRepository->findAll(),
-        ]);
-    }
-
     private $pricingService;
-
 
     public function __construct(PricingService $pricingService)
     {
         $this->pricingService = $pricingService;
+    }
+
+    #[Route('/', name: 'app_poste_one_index', methods: ['GET'])]
+    public function index(PosteOneRepository $posteOneRepository): Response
+    {
+        return $this->render('poste_one/index.html.twig', [
+            'poste_ones' => $posteOneRepository->findRecentAndUpcoming(),
+        ]);
     }
 
     #[Route('/new', name: 'app_poste_one_new', methods: ['GET', 'POST'])]

@@ -14,24 +14,25 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PricingService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\GiftRepository;
+use DateTime;
 
 #[Route('/poste/three')]
 class PosteThreeController extends AbstractController
 {
-    #[Route('/', name: 'app_poste_three_index', methods: ['GET'])]
-    public function index(PosteThreeRepository $posteThreeRepository): Response
-    {
-        return $this->render('poste_three/index.html.twig', [
-            'poste_threes' => $posteThreeRepository->findAll(),
-        ]);
-    }
-
     private $pricingService;
 
     public function __construct(PricingService $pricingService)
     {
         $this->pricingService = $pricingService;
     }
+
+    #[Route('/', name: 'app_poste_three_index', methods: ['GET'])]
+    public function index(PosteThreeRepository $posteThreeRepository): Response
+    {
+        return $this->render('poste_three/index.html.twig', [
+            'poste_threes' => $posteThreeRepository->findRecentAndUpcoming(),
+        ]);
+    } 
 
     #[Route('/new', name: 'app_poste_three_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteThreeRepository $posteThreeRepository, SessionInterface $session, GiftRepository $giftRepository): Response
@@ -216,6 +217,7 @@ class PosteThreeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $posteThree->setApprouved(true);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_admin', [], Response::HTTP_SEE_OTHER);

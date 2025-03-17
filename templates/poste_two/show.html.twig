@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block body %}
+<!-- show poste two -->
     <h1 class="titre">Poste 2</h1>
 
     <table class="table">
@@ -16,25 +17,25 @@
                 <th>Départ</th>
                 <th>Email</th>
                 <th>Tel</th>
-                <th>Validé</th>
-                <th>actions</th>
+                <th>Modifier</th>
+                <th>Supprimer</th>
             </tr>
+        </thead>
         <tbody>
             <tr class="tableValeur">
                 <td>{{ poste_two.start ? poste_two.start|date('d-m-Y H:i:s') : '' }}</td>
                 <td>{{ poste_two.end ? poste_two.end|date('d-m-Y H:i:s') : '' }}</td>
                 <td>{{ poste_two.email }}</td>
                 <td>{{ poste_two.phoneNumber }}</td>
-                <td>{{ poste_two.isApprouved ? 'Oui' : 'Non' }}</td>
                 <td>
                     <a href="{{ path('app_poste_one_edit', {'id': poste_two.id}) }}" class="btnAction">modifier</a>
+                </td>
+                <td>
+                    {{ include('poste_two/_delete_form.html.twig') }}
                 </td>
             </tr>
         </tbody>
     </table>
-    <a href="{{ path('app_approve_reservation_two', {'id': poste_two.id}) }}" class="btnAction">Approuver</a>
-    <a href="{{ path('app_poste_two_edit', {'id': poste_two.id}) }}" class="btnAction">Modifier</a>
     <a href="{{ path('app_poste_two_index') }}" class="btnAction">Retour</a>
 
-    {{ include('poste_two/_delete_form.html.twig') }}
 {% endblock %}

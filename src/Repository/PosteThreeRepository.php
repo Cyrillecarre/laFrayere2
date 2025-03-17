@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\PosteThree;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use DateTime;
 
 /**
  * @extends ServiceEntityRepository<PosteThree>
@@ -15,7 +16,7 @@ class PosteThreeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PosteThree::class);
     }
-    public function findOverlappingEvents(\DateTime $start, \DateTime $end): array
+    public function findOverlappingEvents(DateTime $start, DateTime $end): array
     {
         return $this->createQueryBuilder('e')
         ->where('e.start < :end')
@@ -24,6 +25,19 @@ class PosteThreeRepository extends ServiceEntityRepository
         ->setParameter('end', $end)
         ->getQuery()
         ->getResult();
+    }
+
+    public function findRecentAndUpcoming(): array
+    {
+        $now = new DateTime(); // Date et heure actuelles
+        $oneMonthAgo = (clone $now)->modify('-30 days'); // Date il y a 30 jours
+
+        return $this->createQueryBuilder('p')
+            ->where('p.start >= :oneMonthAgo') // Événements des 30 derniers jours et à venir
+            ->setParameter('oneMonthAgo', $oneMonthAgo)
+            ->orderBy('p.start', 'ASC') // Trie par date de début ascendante
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**

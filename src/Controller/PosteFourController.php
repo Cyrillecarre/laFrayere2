@@ -19,19 +19,19 @@ use App\Repository\GiftRepository;
 #[Route('/poste/four')]
 class PosteFourController extends AbstractController
 {
-    #[Route('/', name: 'app_poste_four_index', methods: ['GET'])]
-    public function index(PosteFourRepository $posteFourRepository): Response
-    {
-        return $this->render('poste_four/index.html.twig', [
-            'poste_fours' => $posteFourRepository->findAll(),
-        ]);
-    }
-
     private $pricingService;
 
     public function __construct(PricingService $pricingService)
     {
         $this->pricingService = $pricingService;
+    }
+
+    #[Route('/', name: 'app_poste_four_index', methods: ['GET'])]
+    public function index(PosteFourRepository $posteFourRepository): Response
+    {
+        return $this->render('poste_four/index.html.twig', [
+            'poste_fours' => $posteFourRepository->findRecentAndUpcoming(),
+        ]);
     }
 
     #[Route('/new', name: 'app_poste_four_new', methods: ['GET', 'POST'])]
@@ -219,6 +219,7 @@ class PosteFourController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $posteFour->setApprouved(true);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_poste_four_index', [], Response::HTTP_SEE_OTHER);

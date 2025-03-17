@@ -16,23 +16,25 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\GiftRepository;
 
+
 #[Route('/poste/two')]
 class PosteTwoController extends AbstractController
 {
-    #[Route('/', name: 'app_poste_two_index', methods: ['GET'])]
-    public function index(PosteTwoRepository $posteTwoRepository): Response
-    {
-        return $this->render('poste_two/index.html.twig', [
-            'poste_twos' => $posteTwoRepository->findAll(),
-        ]);
-    }
-
     private $pricingService;
 
     public function __construct(PricingService $pricingService)
     {
         $this->pricingService = $pricingService;
     }
+
+    #[Route('/', name: 'app_poste_two_index', methods: ['GET'])]
+    public function index(PosteTwoRepository $posteTwoRepository): Response
+    {
+        return $this->render('poste_two/index.html.twig', [
+            'poste_twos' => $posteTwoRepository->findRecentAndUpcoming(),
+        ]);
+    }
+
 
     #[Route('/new', name: 'app_poste_two_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteTwoRepository $posteTwoRepository, SessionInterface $session, GiftRepository $giftRepository): Response
@@ -218,6 +220,7 @@ class PosteTwoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $posteTwo->setApprouved(true);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_poste_two_index', [], Response::HTTP_SEE_OTHER);

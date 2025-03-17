@@ -1,12 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}PosteFour index{% endblock %}
+{% block title %}Poste 4{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
 {% endblock %}
 
 {% block body %}
+<!-- index -->
     <h1 class="titre">Poste 4</h1>
 
     <table class="table">
@@ -16,7 +17,6 @@
                 <th>Départ</th>
                 <th>Email</th>
                 <th>Tel</th>
-                <th>Validé</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -27,7 +27,6 @@
                 <td>{{ poste_four.end ? poste_four.end|date('d-m-Y H:i:s') : '' }}</td>
                 <td>{{ poste_four.email }}</td>
                 <td>{{ poste_four.phoneNumber }}</td>
-                <td>{{ poste_four.isApprouved ? 'Oui' : 'Non' }}</td>
                 <td>
                     <a href="{{ path('app_poste_four_show', {'id': poste_four.id}) }}" class="btnAction">Voir</a>
                 </td>
@@ -39,7 +38,5 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_poste_four_new') }}" class="btnAction">Ajouter une nouvelle réservation</a>
     <a href="{{ path('app_admin') }}" class="btnAction">Retour</a>
 {% endblock %}
