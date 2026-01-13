@@ -6,6 +6,9 @@ use App\Entity\PosteOne;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,6 +22,29 @@ class PosteOneType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $updateFishersField = function (FormInterface $form, ?\DateTimeInterface $start, ?\DateTimeInterface $end): void {
+            $canSelectOne = false;
+
+            if ($start instanceof \DateTimeInterface && $end instanceof \DateTimeInterface) {
+                $startDow = (int) $start->format('N');
+                $endDow = (int) $end->format('N');
+                $canSelectOne = ($startDow >= 1 && $startDow <= 4) && ($endDow >= 2 && $endDow <= 5);
+            }
+
+            $form->add('numberOfFishers', ChoiceType::class, [
+                'label' => 'Nombre de pêcheurs',
+                'choices' => ['1' => 1, '2' => 2],
+                'data' => 2,
+                'mapped' => false,
+                'choice_attr' => function ($choice, $key, $value) use ($canSelectOne) {
+                    if ((int) $value === 1 && !$canSelectOne) {
+                        return ['disabled' => 'disabled'];
+                    }
+                    return [];
+                },
+            ]);
+        };
+
         $builder
             ->add('title', HiddenType::class, [
                     'data' => 'Poste 1',
@@ -32,14 +58,6 @@ class PosteOneType extends AbstractType
                 'date_widget' => 'single_text',
                 'time_widget' => 'text',
                 'data' => (new \DateTime('today 11:00')),
-            ])
-            ->add('numberOfFishers', ChoiceType::class, [
-                'label' => 'Nombre de pêcheurs',
-                'choices' => [
-                    '2' => 2,
-                ],
-                'data' => 2,
-                'mapped' => false,
             ])
             ->add('pellets45', ChoiceType::class, [
                 'label' => 'Pellet 45% protéines',
@@ -186,6 +204,57 @@ class PosteOneType extends AbstractType
                 'attr' => ['placeholder' => 'Entrez un code cadeau'],
             ])
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($updateFishersField): void {
+            $data = $event->getData();
+            if (!$data instanceof PosteOne) {
+                $updateFishersField($event->getForm(), null, null);
+                return;
+            }
+
+            $updateFishersField($event->getForm(), $data->getStart(), $data->getEnd());
+        });
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($updateFishersField): void {
+            $data = $event->getData();
+            $start = null;
+            $end = null;
+
+            if (is_array($data)) {
+                $start = $this->parseSubmittedDateTime($data['start'] ?? null);
+                $end = $this->parseSubmittedDateTime($data['end'] ?? null);
+            }
+
+            $updateFishersField($event->getForm(), $start, $end);
+        });
+    }
+
+    private function parseSubmittedDateTime(mixed $value): ?\DateTimeInterface
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value;
+        }
+
+        if (!is_array($value) && !is_string($value)) {
+            return null;
+        }
+
+        try {
+            if (is_string($value)) {
+                return new \DateTime($value);
+            }
+
+            $date = $value['date'] ?? null;
+            $time = $value['time'] ?? null;
+            if (!is_string($date) || !is_string($time)) {
+                return null;
+            }
+
+            $dt = \DateTime::createFromFormat('Y-m-d H:i', $date . ' ' . $time);
+            return $dt ?: null;
+        } catch (\Exception) {
+            return null;
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

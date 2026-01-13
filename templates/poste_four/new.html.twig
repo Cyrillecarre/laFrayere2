@@ -17,6 +17,79 @@ document.addEventListener('DOMContentLoaded', function() {
         // Pour les navigateurs qui supportent ::part()
         select.setAttribute('style', '--select-font-size: 1.4rem');
     });
+
+    const form = document.querySelector('form');
+    if (!form) return;
+
+    const fishersSelect = form.querySelector('select[name$="[numberOfFishers]"]');
+    const startDateInput = form.querySelector('input[name$="[start][date]"]');
+    const endDateInput = form.querySelector('input[name$="[end][date]"]');
+    const startTimeInput = form.querySelector('input[name$="[start][time]"]');
+    const endTimeInput = form.querySelector('input[name$="[end][time]"]');
+
+    if (!fishersSelect || !startDateInput || !endDateInput) return;
+
+    const dateError = document.createElement('div');
+    dateError.style.color = 'red';
+    dateError.style.marginTop = '0.25rem';
+    endDateInput.parentNode.insertBefore(dateError, endDateInput.nextSibling);
+
+    const dayNumber = (dateStr) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr + 'T00:00:00');
+        if (Number.isNaN(d.getTime())) return null;
+        const jsDay = d.getDay();
+        return jsDay === 0 ? 7 : jsDay;
+    };
+
+    const updateFishers = () => {
+        const startDow = dayNumber(startDateInput.value);
+        const endDow = dayNumber(endDateInput.value);
+        const canSelectOne = startDow !== null && endDow !== null && (startDow >= 1 && startDow <= 4) && (endDow >= 2 && endDow <= 5);
+
+        const optionOne = Array.from(fishersSelect.options).find(o => String(o.value) === '1');
+        if (!optionOne) return;
+
+        optionOne.disabled = !canSelectOne;
+        if (optionOne.disabled && fishersSelect.value === '1') {
+            fishersSelect.value = '2';
+        }
+    };
+
+    startDateInput.addEventListener('change', updateFishers);
+    endDateInput.addEventListener('change', updateFishers);
+    updateFishers();
+
+    const parseDateTime = (dateStr, timeStr) => {
+        if (!dateStr) return null;
+        const t = timeStr || '00:00';
+        const d = new Date(dateStr + 'T' + t);
+        return Number.isNaN(d.getTime()) ? null : d;
+    };
+
+    const validateDates = () => {
+        const startDt = parseDateTime(startDateInput.value, startTimeInput ? startTimeInput.value : null);
+        const endDt = parseDateTime(endDateInput.value, endTimeInput ? endTimeInput.value : null);
+        dateError.textContent = '';
+
+        if (!startDt || !endDt) return;
+
+        if (endDt.getTime() < startDt.getTime()) {
+            dateError.textContent = 'date incorrecte';
+            return;
+        }
+
+        const diffDays = (endDt.getTime() - startDt.getTime()) / 86400000;
+        if (diffDays > 7) {
+            dateError.textContent = 'durée trop longue';
+        }
+    };
+
+    startDateInput.addEventListener('change', validateDates);
+    endDateInput.addEventListener('change', validateDates);
+    if (startTimeInput) startTimeInput.addEventListener('change', validateDates);
+    if (endTimeInput) endTimeInput.addEventListener('change', validateDates);
+    validateDates();
 });
 </script>
 {% endblock %}

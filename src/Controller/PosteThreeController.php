@@ -79,6 +79,11 @@ class PosteThreeController extends AbstractController
                 $entityManager->persist($posteThree);
                 $entityManager->flush();
                 $numFishers = $form->get('numberOfFishers')->getData();
+
+                if ((int) $numFishers === 1 && !$this->isOneFisherAllowed($start, $end)) {
+                    return $this->redirectToRoute('app_poste_three_error');
+                }
+
                 // Normaliser les valeurs pellets pour éviter null/chaînes vides
                 $pellets45 = (int) ($form->get('pellets45')->getData() ?? 0);
                 $pellets35 = (int) ($form->get('pellets35')->getData() ?? 0);
@@ -213,6 +218,13 @@ class PosteThreeController extends AbstractController
             }
         }
         return null;
+    }
+
+    private function isOneFisherAllowed(\DateTimeInterface $start, \DateTimeInterface $end): bool
+    {
+        $startDow = (int) $start->format('N');
+        $endDow = (int) $end->format('N');
+        return ($startDow >= 1 && $startDow <= 4) && ($endDow >= 2 && $endDow <= 5);
     }
 
     #[Route('/poste/three/error', name: 'app_poste_three_error', methods: ['GET'])]
