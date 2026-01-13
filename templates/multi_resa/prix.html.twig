@@ -28,8 +28,8 @@
     function createCheckoutSession(isDeposit) {
         var totalPrice = document.querySelector('input[name="totalPrice"]').value;
         var numNights = document.querySelector('input[name="numNights"]').value;
-        var pellets = document.querySelector('input[name="pellets"]').value;
-        var graines = document.querySelector('input[name="graines"]').value;
+        var pellets45 = document.querySelector('input[name="pellets45"]').value;
+        var pellets35 = document.querySelector('input[name="pellets35"]').value;
         var startDateStr = document.querySelector('input[name="start"]').value;
         var endDateStr = document.querySelector('input[name="end"]').value;
         var email = document.querySelector('input[name="email"]').value;
@@ -48,8 +48,8 @@
                 totalPrice: totalPrice,
                 isDeposit: isDeposit,
                 numNights: numNights,
-                pellets: pellets,
-                graines: graines,
+                pellets45: pellets45,
+                pellets35: pellets35,
                 start: start,
                 end: end,
                 email: email,
@@ -87,15 +87,15 @@
             <p>Date d'arrivée : {{ start }}</p>
             <p>Date de départ : {{ end }}</p>
             <p>Nombre de nuits : {{ numNights }}</p>
-            <p>Pellets : {{ pellets }}</p>
-            <p>Graines : {{ graines }}</p>
+            <p>Pellets45 : {{ pellets45Label }}</p>
+            <p>Pellets35 : {{ pellets35Label }}</p>
             <p>Montant total : {{ totalPrice }} EUR</p>
         </div>
         <form action="{{ path('app_paymentMulti_create') }}" method="POST" class="formPrixButton">
             <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
             <input type="hidden" name="numNights" value="{{ numNights }}">
-            <input type="hidden" name="pellets" value="{{ pellets }}">
-            <input type="hidden" name="graines" value="{{ graines }}">
+            <input type="hidden" name="pellets45" value="{{ pellets45 }}">
+            <input type="hidden" name="pellets35" value="{{ pellets35 }}">
             <input type="hidden" name="start" value="{{ start }}">
             <input type="hidden" name="end" value="{{ end }}">
             <input type="hidden" name="email" value="{{ email }}">

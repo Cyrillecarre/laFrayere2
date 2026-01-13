@@ -9,12 +9,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\PricingService;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\GiftRepository;
+use DateTime;
+use Symfony\Component\Mailer\MailerInterface;
 
 
 #[Route('/poste/two')]
@@ -34,7 +34,6 @@ class PosteTwoController extends AbstractController
             'poste_twos' => $posteTwoRepository->findRecentAndUpcoming(),
         ]);
     }
-
 
     #[Route('/new', name: 'app_poste_two_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteTwoRepository $posteTwoRepository, SessionInterface $session, GiftRepository $giftRepository): Response
@@ -80,15 +79,19 @@ class PosteTwoController extends AbstractController
             } else {
                 $entityManager->persist($posteTwo);
                 $entityManager->flush();
-                $numFishers = $form->get('numberOfFishers')->getData();
-                $pellets = $form->get('pellets')->getData();
-                $graines = $form->get('graines')->getData();
+                $numFishers = (int)$form->get('numberOfFishers')->getData(); 
+                // Normaliser les valeurs pellets pour éviter null/chaînes vides
+                $pellets45 = (int) ($form->get('pellets45')->getData() ?? 0);
+                $pellets35 = (int) ($form->get('pellets35')->getData() ?? 0);
+                // Récupérer les libellés correspondants aux valeurs choisies pour l'affichage
+                $pellets45Label = $this->getChoiceLabel($form, 'pellets45', $pellets45) ?? '0';
+                $pellets35Label = $this->getChoiceLabel($form, 'pellets35', $pellets35) ?? '0';
                 $giftCode = $form->get('giftCode')->getData();
                 
                 try {
                     $totalPrice = $this->pricingService->calculatePrice($numNights, $numFishers, [
-                        'pellets' => $pellets,
-                        'graines' => $graines
+                        'pellets45' => $pellets45,
+                        'pellets35' => $pellets35
                     ]);
 
                     $giftValue = 0;
@@ -102,7 +105,7 @@ class PosteTwoController extends AbstractController
                             $totalPriceAfter = max(0, $totalPrice - $giftValue);
                         } else {
                             $this->addFlash('error', 'Code promo invalide ou déjà utilisé.');
-                            return $this->redirectToRoute('app_poste_one_new');
+                            return $this->redirectToRoute('app_poste_two_new');
                         }
                     }
 
@@ -113,7 +116,6 @@ class PosteTwoController extends AbstractController
                     $totalPriceAfter = $totalPrice;
                 }
 
-
                 $session->set('reservation_details', [
                     'posteId' => $posteTwo->getId(),
                     'poste_title' => 'Poste 2',
@@ -123,8 +125,10 @@ class PosteTwoController extends AbstractController
                     'start' => $posteTwo->getStart()->format('Y-m-d'),
                     'end' => $posteTwo->getEnd()->format('Y-m-d'),
                     'numberOfFishers' => $form->get('numberOfFishers')->getData(),
-                    'pellets' => $form->get('pellets')->getData(),
-                    'graines' => $form->get('graines')->getData(),
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'pellets45Label' => $pellets45Label,
+                    'pellets35Label' => $pellets35Label,
                     'email' => $form->get('email')->getData(),
                     'phoneNumber' => $form->get('phoneNumber')->getData(),
                     'totalPrice' => $totalPrice,
@@ -135,8 +139,10 @@ class PosteTwoController extends AbstractController
                     'totalPrice' => $totalPrice,
                     'numNights' => $numNights,
                     'numFishers' => $numFishers,
-                    'pellets' => $pellets,
-                    'graines' => $graines,
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'pellets45Label' => $pellets45Label,
+                    'pellets35Label' => $pellets35Label,
                     'poste_id' => $posteTwo->getId(),
                     'poste_type' => 'deux',
                     'start' => $posteTwo->getStart()->format('Y-m-d'),
@@ -161,25 +167,34 @@ class PosteTwoController extends AbstractController
         $totalPrice = (float) $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
         $numFishers = $request->query->get('numFishers');
-        $pellets = $request->query->get('pellets');
-        $graines = $request->query->get('graines');
+        $pellets45 = $request->query->get('pellets45');
+        $pellets35 = $request->query->get('pellets35');
+        $pellets45Label = $request->query->get('pellets45Label');
+        $pellets35Label = $request->query->get('pellets35Label');
         $posteId = $request->query->get('poste_id');
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
         $end = \DateTime::createFromFormat('Y-m-d', $request->query->get('end'));
         $totalPriceAfter = $request->query->get('totalPriceAfter',$totalPrice);
 
+        // Récupérer les détails de réservation dans la session
         $reservationDetails = $session->get('reservation_details', []);
         $giftCode = $reservationDetails['giftCode'] ?? null;
         $giftValue = $reservationDetails['giftValue'] ?? 0;
+        // Libellés depuis la session si non passés en query
+        if (!$pellets45Label) { $pellets45Label = $reservationDetails['pellets45Label'] ?? (string)$pellets45; }
+        if (!$pellets35Label) { $pellets35Label = $reservationDetails['pellets35Label'] ?? (string)$pellets35; }
+
 
         return $this->render('poste_two/prix.html.twig', [
             'totalPrice' => $totalPrice,
             'totalPriceAfter' => $totalPriceAfter,
             'numNights' => $numNights,
             'numFishers' => $numFishers,
-            'pellets' => $pellets,
-            'graines' => $graines,
+            'pellets45' => $pellets45,
+            'pellets35' => $pellets35,
+            'pellets45Label' => $pellets45Label,
+            'pellets35Label' => $pellets35Label,
             'stripe_public_key' => $stripePublicKey,
             'poste_id' => $posteId,
             'poste_type' => $posteType,
@@ -188,6 +203,17 @@ class PosteTwoController extends AbstractController
             'giftCode' => $giftCode,
             'giftValue' => $giftValue,
         ]);
+    }
+
+    private function getChoiceLabel($form, string $field, $selectedValue): ?string
+    {
+        $choices = $form->get($field)->getConfig()->getOption('choices'); // [label => value]
+        foreach ($choices as $label => $value) {
+            if ($value === $selectedValue) {
+                return $label;
+            }
+        }
+        return null;
     }
 
     #[Route('/poste/two/error', name: 'app_poste_two_error', methods: ['GET'])]

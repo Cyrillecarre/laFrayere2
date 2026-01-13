@@ -217,6 +217,66 @@
     margin: 0 auto;
 }
 
+.numberFormPellet {
+    display: flex;
+    justify-content: center;
+    width: 9rem;
+    height: 2rem;
+    gap: 0.5rem;
+    margin: 0 auto;
+    font-size: 1rem !important;
+}
+
+/* Style pour les menus déroulants de pellets */
+.large-font-select {
+    font-size: 1.1rem; /* taille normale pour le champ fermé */
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 100%;
+    max-width: 420px; /* largeur raisonnable */
+    margin: 0.5rem 0;
+    min-height: 48px; /* boost de lisibilité du champ fermé */
+}
+
+.large-font-select optgroup {
+    font-weight: bold;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 4px 0;
+    font-size: 1.3rem; /* groupe un peu plus grand */
+}
+
+/* Style pour les options */
+.large-font-select option {
+    font-size: 1.6rem; /* texte plus grand quand déroulé */
+    padding: 0.75rem 0.5rem;
+    line-height: 1.5;
+}
+
+/* Zoom x2 uniquement pendant l'ouverture via une classe temporaire ajoutée en JS */
+.form select.select-open,
+select.select-open {
+    font-size: 2rem !important; /* x2 */
+    line-height: 1.3 !important;
+}
+
+/* Style pour les séparateurs */
+.option-separator {
+    background-color: #f0f0f0;
+    color: #666;
+    font-weight: bold;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Styles conditionnels par poids */
+.option-2kg { background-color: #f8f8f8; }
+.option-5kg { background-color: #f0f0f0; }
+.option-10kg { background-color: #e8e8e8; }
+.option-25kg { background-color: #e0e0e0; }
+
 .hr {
     display: flex;
     justify-content: center;
@@ -397,4 +457,5 @@
     .alert {
         width: 80%;
     }
+    
 }

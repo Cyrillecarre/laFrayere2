@@ -30,8 +30,8 @@
                 var posteId = document.querySelector('input[name="poste_id"]').value;
                 var numFishers = document.querySelector('input[name="numFishers"]').value;
                 var numNights = document.querySelector('input[name="numNights"]').value;
-                var pellets = document.querySelector('input[name="pellets"]').value;
-                var graines = document.querySelector('input[name="graines"]').value;
+                var pellets45 = document.querySelector('input[name="pellets45"]').value;
+                var pellets35 = document.querySelector('input[name="pellets35"]').value;
                 var posteType = document.querySelector('input[name="poste_type"]').value;
                 var giftValue = document.querySelector('input[name="giftValue"]').value || 0;
                 var startDateStr = document.querySelector('input[name="start"]').value;
@@ -50,8 +50,8 @@
                         posteId: posteId,
                         numFishers: numFishers,
                         numNights: numNights,
-                        pellets: pellets,
-                        graines: graines,
+                        pellets45: pellets45,
+                        pellets35: pellets35,
                         posteType: posteType,
                         start: startDateStr,
                         end: endDateStr,
@@ -86,31 +86,31 @@
     <h1 class="titre">réservation Poste 3</h1>
 
     {% if totalPrice is not null %}
-        <div class="formPrix">
-            <p>Date d'arrivée : {{ start }}</p>
-            <p>Date de départ : {{ end }}</p>
-            <p>Nombre de pêcheurs : {{ numFishers }}</p>
-            <p>Nombre de nuits : {{ numNights }}</p>
-            <p>Pellets : {{ pellets }}</p>
-            <p>Graines : {{ graines }}</p>
-            <p>Code cadeau appliqué : {{ giftCode }}</p>
-            <p>Valeur du code cadeau : {{ giftValue|default(0) }} EUR</p>
-            <p>Montant total : {{ totalPrice }} EUR</p>
-            <p>Montant restant à payer : {{ totalPriceAfter }} EUR</p>
-        </div>
-        <form action="{{ path('app_payment_create') }}" method="POST" class="formPrixButton">
-            <input type="hidden" name="totalPriceAfter" value="{{ totalPriceAfter }}">
-            <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
-            <input type="hidden" name="poste_id" value="{{ poste_id }}">
-            <input type="hidden" name="numFishers" value="{{ numFishers }}">
-            <input type="hidden" name="numNights" value="{{ numNights }}">
-            <input type="hidden" name="pellets" value="{{ pellets }}">
-            <input type="hidden" name="graines" value="{{ graines }}">
-            <input type="hidden" name="poste_type" value="{{ poste_type }}">
-            <input type="hidden" name="start" value="{{ start }}">
-            <input type="hidden" name="end" value="{{ end }}">
-            <input type="hidden" name="giftValue" value="{{ giftValue|default(0) }}">
-            {% if totalPriceAfter > 0 %}
+            <div class="formPrix">
+                <p>Date d'arrivée : {{ start }}</p>
+                <p>Date de départ : {{ end }}</p>
+                <p>Nombre de pêcheurs : {{ numFishers }}</p>
+                <p>Nombre de nuits : {{ numNights }}</p>
+                <p>Pellets45 : {{ pellets45Label }}</p>
+                <p>Pellets35 : {{ pellets35Label }}</p>
+                <p>Code cadeau appliqué : {{ giftCode }}</p>
+                <p>Valeur du code cadeau : {{ giftValue|default(0) }} EUR</p>
+                <p>Montant total : {{ totalPrice }} EUR</p>
+                <p>Montant restant à payer : {{ totalPriceAfter }} EUR</p>
+            </div>
+            <form action="{{ path('app_payment_create') }}" method="POST" class="formPrixButton">
+                <input type="hidden" name="totalPriceAfter" value="{{ totalPriceAfter }}">
+                <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
+                <input type="hidden" name="poste_id" value="{{ poste_id }}">
+                <input type="hidden" name="numFishers" value="{{ numFishers }}">
+                <input type="hidden" name="numNights" value="{{ numNights }}">
+                <input type="hidden" name="pellets45" value="{{ pellets45 }}">
+                <input type="hidden" name="pellets35" value="{{ pellets35 }}">
+                <input type="hidden" name="poste_type" value="{{ poste_type }}">
+                <input type="hidden" name="start" value="{{ start }}">
+                <input type="hidden" name="end" value="{{ end }}">
+                <input type="hidden" name="giftValue" value="{{ giftValue|default(0) }}">
+                {% if totalPriceAfter > 0 %}
                     <div>
                         <button type="button" id="checkout-button" class="btnAction">Régler la totalité</button>
                     </div>
@@ -122,13 +122,13 @@
                         <button type="button" id="checkout-button" class="btnAction">Valider la session</button>
                     </div>
                 {% endif %}
-            <p class="textPrix">Vous allez être redirigé vers la page de paiement sécurisé</p>
-        </form>
+                <p class="textPrix">Vous allez être redirigé vers la page de paiement sécurisé</p>
+            </form>
         {% else %}
-        <p class="textPrix">Une erreur est survenue lors du calcul du montant total.</p>
-    {% endif %}
+            <p class="textPrix">Une erreur est survenue lors du calcul du montant total.</p>
+        {% endif %}
 
-    <hr class="hr">
-    <a href="{{ path('app_poste_three_new') }}" class="btnAction">Retour</a>
-</main>
+        <hr class="hr">
+        <a href="{{ path('app_poste_one_new') }}" class="btnAction">Retour</a>
+    </main>
 {% endblock %}

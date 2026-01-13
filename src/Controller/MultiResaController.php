@@ -95,16 +95,18 @@ class MultiResaController extends AbstractController
                     $this->createAndPersistPoste(new PosteFour(), $startDateTime, $endDateTime, $email, $phoneNumber);
 
                     $totalPrice = $this->pricingService->calculateMultiPostePrice($numNights, [
-                        'pellets' => $pellets,
-                        'graines' => $graines,
+                        'pellets45' => $pellets45,
+                        'pellets35' => $pellets35
                     ]);
 
                     // Stocker les détails de la réservation dans la session
                     $session->set('reservation_details', [
                         'totalPrice' => $totalPrice,
                         'numNights' => $numNights,
-                        'pellets' => $pellets,
-                        'graines' => $graines,
+                        'pellets45' => $pellets45,
+                        'pellets35' => $pellets35,
+                        'pellets45Label' => $pellets45Label,
+                        'pellets35Label' => $pellets35Label,
                         'start' => $startDateTime->format('Y-m-d'),
                         'end' => $endDateTime->format('Y-m-d'),
                         'email' => $email,
@@ -115,13 +117,14 @@ class MultiResaController extends AbstractController
                     return $this->redirectToRoute('app_multi_prix', [
                         'totalPrice' => $totalPrice,
                         'numNights' => $numNights,
-                        'pellets' => $pellets,
-                        'graines' => $graines,
+                        'pellets45' => $pellets45,
+                        'pellets35' => $pellets35,
+                        'pellets45Label' => $pellets45Label,
+                        'pellets35Label' => $pellets35Label,
                         'start' => $startDateTime->format('Y-m-d'),
                         'end' => $endDateTime->format('Y-m-d'),
                         'email' => $email,
                         'phoneNumber' => $phoneNumber,
-
                     ]);
                 } else {
                     return $this->redirectToRoute('app_poste_one_error'); // Si un poste n'est pas disponible
@@ -155,8 +158,10 @@ class MultiResaController extends AbstractController
         $stripePublicKey = $this->getParameter('stripe_public_key');
         $totalPrice = $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
-        $pellets = $request->query->get('pellets');
-        $graines = $request->query->get('graines');
+        $pellets45 = $request->query->get('pellets45');
+        $pellets35 = $request->query->get('pellets35');
+        $pellets45Label = $request->query->get('pellets45Label');
+        $pellets35Label = $request->query->get('pellets35Label');
         $posteId = $request->query->get('poste_id');
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
@@ -168,8 +173,10 @@ class MultiResaController extends AbstractController
         return $this->render('multi_resa/prix.html.twig', [
             'totalPrice' => $totalPrice,
             'numNights' => $numNights,
-            'pellets' => $pellets,
-            'graines' => $graines,
+            'pellets45' => $pellets45,
+            'pellets35' => $pellets35,
+            'pellets45Label' => $pellets45Label,
+            'pellets35Label' => $pellets35Label,
             'stripe_public_key' => $stripePublicKey,
             'poste_id' => $posteId,
             'poste_type' => $posteType,
@@ -178,5 +185,16 @@ class MultiResaController extends AbstractController
             'email' => $email,
             'phoneNumber' => $phoneNumber,
         ]);
+    }
+
+    private function getChoiceLabel($form, string $field, $selectedValue): ?string
+    {
+        $choices = $form->get($field)->getConfig()->getOption('choices'); // [label => value]
+        foreach ($choices as $label => $value) {
+            if ($value === $selectedValue) {
+                return $label;
+            }
+        }
+        return null;
     }
 }

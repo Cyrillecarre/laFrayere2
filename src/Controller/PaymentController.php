@@ -29,7 +29,30 @@ class PaymentController extends AbstractController
     private $entityManager;
     private $logger;
 
-
+    /**
+     * Map numeric pellet code to human-readable label used in forms.
+     * Falls back to string cast of value if unknown.
+     */
+    private function mapPelletLabel(string $type, int $value): string
+    {
+        if ($value === 0) {
+            return '0';
+        }
+        $map45 = [
+            204 => '2kg 4mm 5€', 205 => '2kg 5mm 5€', 206 => '2kg 6mm 5€', 208 => '2kg 8mm 5€', 211 => '2kg 11mm 5€',
+            504 => '5kg 4mm 12.5€', 505 => '5kg 5mm 12.5€', 506 => '5kg 6mm 12.5€', 508 => '5kg 8mm 12.5€', 511 => '5kg 11mm 12.5€',
+            1004 => '10kg 4mm 20€', 1005 => '10kg 5mm 20€', 1006 => '10kg 6mm 20€', 1008 => '10kg 8mm 20€', 1011 => '10kg 11mm 20€',
+            2504 => '25kg 4mm 46€', 2505 => '25kg 5mm 46€', 2506 => '25kg 6mm 46€', 2508 => '25kg 8mm 46€', 2511 => '25kg 11mm 46€',
+        ];
+        $map35 = [
+            204 => '2kg 4mm 5€', 205 => '2kg 5mm 5€', 206 => '2kg 6mm 5€', 208 => '2kg 8mm 5€', 211 => '2kg 11mm 5€',
+            504 => '5kg 4mm 10€', 505 => '5kg 5mm 10€', 506 => '5kg 6mm 10€', 508 => '5kg 8mm 10€', 511 => '5kg 11mm 10€',
+            1004 => '10kg 4mm 18€', 1005 => '10kg 5mm 18€', 1006 => '10kg 6mm 18€', 1008 => '10kg 8mm 18€', 1011 => '10kg 11mm 18€',
+            2504 => '25kg 4mm 42€', 2505 => '25kg 5mm 42€', 2506 => '25kg 6mm 42€', 2508 => '25kg 8mm 42€', 2511 => '25kg 11mm 42€',
+        ];
+        $map = $type === 'pellets45' ? $map45 : $map35;
+        return $map[$value] ?? (string)$value;
+    }
 
     public function __construct(UrlGeneratorInterface $urlGenerator, MailerInterface $mailer, EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
@@ -37,8 +60,6 @@ class PaymentController extends AbstractController
         $this->mailer = $mailer;
         $this->entityManager = $entityManager;
         $this->logger = $logger;
-
-
     }
 
     #[Route('/create-checkout-session', name: 'app_payment_create', methods: ['POST'])]
@@ -47,18 +68,18 @@ class PaymentController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             $this->logger->info('Données reçues:', $data);
- 
+
             if (!isset($data['totalPrice']) || !isset($data['isDeposit']) || !isset($data['posteId']) || !isset($data['posteType'])) {
                 throw new \Exception("Données requises manquantes.");
             }
-            
+
             $totalPriceAfter = (float) $data['totalPriceAfter'];
             $totalPrice = (float) $data['totalPrice'];
             $isDeposit = (bool) $data['isDeposit'];
             $posteId = $data['posteId'];
             $posteType = $data['posteType'];
-            $pellets = $data['pellets'];
-            $graines = $data['graines'];
+            $pellets45 = $data['pellets45'];
+            $pellets35 = $data['pellets35'];
             $giftValue = $data['giftValue'] ?? 0;
 
             if ($isDeposit) {
@@ -67,11 +88,11 @@ class PaymentController extends AbstractController
             } else {
                 $amountToCharge = $totalPriceAfter;
             }
-    
+
             $amountToChargeCents = $amountToCharge * 100;
-    
+
             Stripe::setApiKey($this->getParameter('stripe_secret_key'));
-    
+
             $stripeSession = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
@@ -86,13 +107,13 @@ class PaymentController extends AbstractController
                 ]],
                 'mode' => 'payment',
                 'success_url' => $this->generateUrl('app_payment_success', [
-                    'poste_id' => $posteId, 
-                    'poste_type' => $posteType, 
+                    'poste_id' => $posteId,
+                    'poste_type' => $posteType,
                     'totalPriceAfter' => $totalPriceAfter,
                     'totalPrice' => $totalPrice,
-                    'is_deposit' => $amountToCharge, 
-                    'pellets' => $pellets, 
-                    'graines' => $graines,
+                    'is_deposit' => $amountToCharge,
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
                     'giftValue' => $giftValue,
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
                 'cancel_url' => $this->generateUrl('app_payment_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
@@ -102,19 +123,19 @@ class PaymentController extends AbstractController
                     'totalPriceAfter' => $totalPriceAfter,
                     'totalPrice' => $totalPrice,
                     'is_deposit' => $amountToCharge,
-                    'pellets' => $pellets,
-                    'graines' => $graines,
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
                     'giftValue' => $giftValue,
                 ],
             ]);
-    
+
             $this->logger->info('Session Stripe créée avec succès', [
                 'session_id' => $stripeSession->id,
                 'success_url' => $stripeSession->success_url,
             ]);
-    
+
             return new JsonResponse(['id' => $stripeSession->id]);
-    
+
         } catch (\Exception $e) {
             $this->logger->error('Erreur lors de la création de la session:', [
                 'error' => $e->getMessage(),
@@ -149,8 +170,10 @@ class PaymentController extends AbstractController
             $posteType = $reservationDetails['poste_type'];
             $email = $reservationDetails['email'];
             $phoneNumber = $reservationDetails['phoneNumber'];
-            $pellets = $request->query->get('pellets');
-            $graines = $request->query->get('graines');
+            $pellets45 = $request->query->get('pellets45');
+            $pellets35 = $request->query->get('pellets35');
+            $pellets45Label = $reservationDetails['pellets45Label'] ?? $this->mapPelletLabel('pellets45', (int)$pellets45);
+            $pellets35Label = $reservationDetails['pellets35Label'] ?? $this->mapPelletLabel('pellets35', (int)$pellets35);
 
             // Utiliser les dates de la session au lieu des paramètres de requête
             try {
@@ -230,8 +253,10 @@ class PaymentController extends AbstractController
                             'totalPrice' => $totalPrice,
                             'giftValue' => $giftValue,
                             'is_deposit' => $isDeposit,
-                            'pellets' => $pellets,
-                            'graines' => $graines,
+                            'pellets45' => $pellets45,
+                            'pellets35' => $pellets35,
+                            'pellets45Label' => $pellets45Label,
+                            'pellets35Label' => $pellets35Label,
                             'email' => $email,
                             'phoneNumber' => $phoneNumber,
                             'remainingGiftValue' => $remainingGiftValue,
@@ -260,8 +285,10 @@ class PaymentController extends AbstractController
                 'totalPriceAfter' => $totalPriceAfter,
                 'totalPrice' => $totalPrice,
                 'is_deposit' => $isDeposit,
-                'pellets' => $pellets,
-                'graines' => $graines,
+                'pellets45' => $pellets45,
+                'pellets35' => $pellets35,
+                'pellets45Label' => $pellets45Label,
+                'pellets35Label' => $pellets35Label,
                 'giftValue' => $giftValue,
                 'remainingGiftValue' => $remainingGiftValue,
             ]);
@@ -288,99 +315,102 @@ class PaymentController extends AbstractController
 
     #[Route('/create-checkout-session-multi', name: 'app_paymentMulti_create', methods: ['POST'])]
     public function createCheckoutSessionMulti(Request $request): JsonResponse
-{
-    try {
-        $data = json_decode($request->getContent(), true);
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['totalPrice']) || !isset($data['isDeposit']) || !isset($data['start']) || !isset($data['end'])) {
-            throw new \Exception("Données requises à l'entrée manquantes.");
-        }
+            if (!isset($data['totalPrice']) || !isset($data['isDeposit']) || !isset($data['start']) || !isset($data['end'])) {
+                throw new \Exception("Données requises à l'entrée manquantes.");
+            }
 
-        $totalPrice = (float) $data['totalPrice'];
-        $isDeposit = (bool) $data['isDeposit'];
-        $currentYear = date('Y');
-        $startDateTime = \DateTime::createFromFormat('d-m-Y', $data['start'] . '-' . $currentYear);
-        $endDateTime = \DateTime::createFromFormat('d-m-Y', $data['end'] . '-' . $currentYear);
-        $email = $data['email'];
-        $phoneNumber = $data['phoneNumber'];
+            $totalPrice = (float) $data['totalPrice'];
+            $isDeposit = (bool) $data['isDeposit'];
+            $currentYear = date('Y');
+            $startDateTime = \DateTime::createFromFormat('d-m-Y', $data['start'] . '-' . $currentYear);
+            $endDateTime = \DateTime::createFromFormat('d-m-Y', $data['end'] . '-' . $currentYear);
+            $email = $data['email'];
+            $phoneNumber = $data['phoneNumber'];
 
-        if (!$startDateTime || !$endDateTime) {
-            throw new \Exception("Erreur lors du parsing des dates.");
-        }
+            if (!$startDateTime || !$endDateTime) {
+                throw new \Exception("Erreur lors du parsing des dates.");
+            }
 
-        $pellets = $data['pellets'];
-        $graines = $data['graines'];
+            $pellets45 = $data['pellets45'];
+            $pellets35 = $data['pellets35'];
 
-        if ($isDeposit) {
-            $depositAmount = $totalPrice * 0.30;
-            $amountToCharge = ceil($depositAmount / 10) * 10; // Arrondir à la dizaine supérieure
-        } else {
-            $amountToCharge = $totalPrice;
-        }
+            if ($isDeposit) {
+                $depositAmount = $totalPrice * 0.30;
+                $amountToCharge = ceil($depositAmount / 10) * 10; // Arrondir à la dizaine supérieure
+            } else {
+                $amountToCharge = $totalPrice;
+            }
 
-        $amountToChargeCents = $amountToCharge * 100;
+            $amountToChargeCents = $amountToCharge * 100;
 
-        Stripe::setApiKey($this->getParameter('stripe_secret_key'));
+            Stripe::setApiKey($this->getParameter('stripe_secret_key'));
 
-        $stripeSession = Session::create([
-            'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => [
-                        'name' => $isDeposit ? 'Acompte de réservation - Étang complet' : 'Paiement de réservation - Étang complet',
+            $stripeSession = Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'product_data' => [
+                            'name' => $isDeposit ? 'Acompte de réservation - Étang complet' : 'Paiement de réservation - Étang complet',
+                        ],
+                        'unit_amount' => $amountToChargeCents,
                     ],
-                    'unit_amount' => $amountToChargeCents,
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => $this->generateUrl('app_paymentMulti_success', [
+                    'totalPrice' => $totalPrice,
+                    'is_deposit' => $amountToCharge,
+                    'start' => $startDateTime->format('d-m-Y'),
+                    'end' => $endDateTime->format('d-m-Y'),
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'email' => $email,
+                    'phoneNumber' => $phoneNumber,
+                ], UrlGeneratorInterface::ABSOLUTE_URL),
+                'cancel_url' => $this->generateUrl('app_payment_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                'metadata' => [
+                    'totalPrice' => $totalPrice,
+                    'is_deposit' => $amountToCharge,
+                    'start' => $startDateTime->format('d-m-Y'),
+                    'end' => $endDateTime->format('d-m-Y'),
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'email' => $email,
+                    'phoneNumber' => $phoneNumber,
                 ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'success_url' => $this->generateUrl('app_paymentMulti_success', [
-                'totalPrice' => $totalPrice,
-                'is_deposit' => $amountToCharge,
-                'start' => $startDateTime->format('d-m-Y'),
-                'end' => $endDateTime->format('d-m-Y'),
-                'pellets' => $pellets,
-                'graines' => $graines,
-                'email' => $email,
-                'phoneNumber' => $phoneNumber,
-            ], UrlGeneratorInterface::ABSOLUTE_URL),
-            'cancel_url' => $this->generateUrl('app_payment_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'metadata' => [
-                'totalPrice' => $totalPrice,
-                'is_deposit' => $amountToCharge,
-                'start' => $startDateTime->format('d-m-Y'),
-                'end' => $endDateTime->format('d-m-Y'),
-                'pellets' => $pellets,
-                'graines' => $graines,
-                'email' => $email,
-                'phoneNumber' => $phoneNumber,
-            ],
-        ]);
+            ]);
 
-        return new JsonResponse(['id' => $stripeSession->id]);
+            return new JsonResponse(['id' => $stripeSession->id]);
 
-    } catch (\Exception $e) {
-        return new JsonResponse(['error' => $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
     }
-    }
+
     #[Route('/payment-success-multi', name: 'app_paymentMulti_success')]
     public function paymentSuccessMulti(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session): Response
-{
-    $totalPrice = $request->query->get('totalPrice');
-    $isDeposit = $request->query->get('is_deposit');
-    $startDateTime = \DateTime::createFromFormat('d-m-Y', $request->query->get('start'));
-    $endDateTime = \DateTime::createFromFormat('d-m-Y', $request->query->get('end'));
-    $pellets = $request->query->get('pellets');
-    $graines = $request->query->get('graines');
-    $email = $request->query->get('email');
-    $phoneNumber = $request->query->get('phoneNumber');
+    {
+        $totalPrice = $request->query->get('totalPrice');
+        $isDeposit = $request->query->get('is_deposit');
+        $startDateTime = \DateTime::createFromFormat('d-m-Y', $request->query->get('start'));
+        $endDateTime = \DateTime::createFromFormat('d-m-Y', $request->query->get('end'));
+        $pellets45 = $request->query->get('pellets45');
+        $pellets35 = $request->query->get('pellets35');
+        $pellets45Label = $this->mapPelletLabel('pellets45', (int)$pellets45);
+        $pellets35Label = $this->mapPelletLabel('pellets35', (int)$pellets35);
+        $email = $request->query->get('email');
+        $phoneNumber = $request->query->get('phoneNumber');
 
-    $startDateTime->setTime(14, 0);
-    $endDateTime->setTime(11, 0);
+        $startDateTime->setTime(14, 0);
+        $endDateTime->setTime(11, 0);
 
-    // Liste des postes à réserver
-    $postes = [
+        // Liste des postes à réserver
+        $postes = [
         ['poste' => new PosteOne(), 'title' => 'Poste 1'],
         ['poste' => new PosteTwo(), 'title' => 'Poste 2'],
         ['poste' => new PosteThree(), 'title' => 'Poste 3'],
@@ -421,8 +451,10 @@ class PaymentController extends AbstractController
         'end' => $endDateTime->format('d-m'),
         'totalPrice' => $totalPrice,
         'is_deposit' => $isDeposit,
-        'pellets' => $pellets,
-        'graines' => $graines,
+        'pellets45' => $pellets45,
+        'pellets35' => $pellets35,
+        'pellets45Label' => $pellets45Label,
+        'pellets35Label' => $pellets35Label,
         'email' => $email,
         'phoneNumber' => $phoneNumber,
     ]);
@@ -441,8 +473,10 @@ class PaymentController extends AbstractController
         'end' => $endDateTime->format('d-m'),
         'totalPrice' => $totalPrice,
         'is_deposit' => $isDeposit,
-        'pellets' => $pellets,
-        'graines' => $graines,
+        'pellets45' => $pellets45,
+        'pellets35' => $pellets35,
+        'pellets45Label' => $pellets45Label,
+        'pellets35Label' => $pellets35Label,
     ]);
     }
 

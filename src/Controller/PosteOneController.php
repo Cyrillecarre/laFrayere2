@@ -14,7 +14,7 @@ use App\Service\PricingService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\GiftRepository;
 use DateTime;
-
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/poste/one')]
 class PosteOneController extends AbstractController
@@ -79,15 +79,18 @@ class PosteOneController extends AbstractController
                 $entityManager->persist($posteOne);
                 $entityManager->flush();
                 $numFishers = $form->get('numberOfFishers')->getData();
-                $pellets = $form->get('pellets')->getData();
-                $graines = $form->get('graines')->getData();
+                // Normaliser les valeurs pellets pour éviter null/chaînes vides
+                $pellets45 = (int) ($form->get('pellets45')->getData() ?? 0);
+                $pellets35 = (int) ($form->get('pellets35')->getData() ?? 0);
+                // Récupérer les libellés correspondants aux valeurs choisies pour l'affichage
+                $pellets45Label = $this->getChoiceLabel($form, 'pellets45', $pellets45) ?? '0';
+                $pellets35Label = $this->getChoiceLabel($form, 'pellets35', $pellets35) ?? '0';
                 $giftCode = $form->get('giftCode')->getData();
-                
                 
                 try {
                     $totalPrice = $this->pricingService->calculatePrice($numNights, $numFishers, [
-                        'pellets' => $pellets,
-                        'graines' => $graines
+                        'pellets45' => $pellets45,
+                        'pellets35' => $pellets35
                     ]);
 
                     $giftValue = 0;
@@ -105,14 +108,12 @@ class PosteOneController extends AbstractController
                         }
                     }
 
-                } catch (\InvalidArgumentException $e) {
-                    return $this->redirectToRoute('app_poste_one_error');
-                }
+                 } catch (\InvalidArgumentException $e) {
+                     return $this->redirectToRoute('app_poste_one_error');
+                 }
                 if (!isset($totalPriceAfter)) {
                     $totalPriceAfter = $totalPrice;
                 }
-
-               
 
                 $session->set('reservation_details', [
                     'posteId' => $posteOne->getId(),
@@ -123,8 +124,10 @@ class PosteOneController extends AbstractController
                     'start' => $posteOne->getStart()->format('Y-m-d'),
                     'end' => $posteOne->getEnd()->format('Y-m-d'),
                     'numberOfFishers' => $form->get('numberOfFishers')->getData(),
-                    'pellets' => $form->get('pellets')->getData(),
-                    'graines' => $form->get('graines')->getData(),
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'pellets45Label' => $pellets45Label,
+                    'pellets35Label' => $pellets35Label,
                     'email' => $form->get('email')->getData(),
                     'phoneNumber' => $form->get('phoneNumber')->getData(),
                     'totalPrice' => $totalPrice,
@@ -135,8 +138,10 @@ class PosteOneController extends AbstractController
                     'totalPrice' => $totalPrice,
                     'numNights' => $numNights,
                     'numFishers' => $numFishers,
-                    'pellets' => $pellets,
-                    'graines' => $graines,
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'pellets45Label' => $pellets45Label,
+                    'pellets35Label' => $pellets35Label,
                     'poste_id' => $posteOne->getId(),
                     'poste_type' => 'un',
                     'start' => $posteOne->getStart()->format('Y-m-d'),
@@ -154,7 +159,6 @@ class PosteOneController extends AbstractController
         ]);
     }
 
-
     #[Route('/prix', name: 'app_poste_one_prix', methods: ['GET'])]
     public function summary(Request $request, SessionInterface $session): Response
     {
@@ -162,8 +166,10 @@ class PosteOneController extends AbstractController
         $totalPrice = (float) $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
         $numFishers = $request->query->get('numFishers');
-        $pellets = $request->query->get('pellets');
-        $graines = $request->query->get('graines');
+        $pellets45 = $request->query->get('pellets45');
+        $pellets35 = $request->query->get('pellets35');
+        $pellets45Label = $request->query->get('pellets45Label');
+        $pellets35Label = $request->query->get('pellets35Label');
         $posteId = $request->query->get('poste_id');
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
@@ -174,6 +180,9 @@ class PosteOneController extends AbstractController
         $reservationDetails = $session->get('reservation_details', []);
         $giftCode = $reservationDetails['giftCode'] ?? null;
         $giftValue = $reservationDetails['giftValue'] ?? 0;
+        // Libellés depuis la session si non passés en query
+        if (!$pellets45Label) { $pellets45Label = $reservationDetails['pellets45Label'] ?? (string)$pellets45; }
+        if (!$pellets35Label) { $pellets35Label = $reservationDetails['pellets35Label'] ?? (string)$pellets35; }
 
 
         return $this->render('poste_one/prix.html.twig', [
@@ -181,8 +190,10 @@ class PosteOneController extends AbstractController
             'totalPriceAfter' => $totalPriceAfter,
             'numNights' => $numNights,
             'numFishers' => $numFishers,
-            'pellets' => $pellets,
-            'graines' => $graines,
+            'pellets45' => $pellets45,
+            'pellets35' => $pellets35,
+            'pellets45Label' => $pellets45Label,
+            'pellets35Label' => $pellets35Label,
             'stripe_public_key' => $stripePublicKey,
             'poste_id' => $posteId,
             'poste_type' => $posteType,
@@ -193,6 +204,16 @@ class PosteOneController extends AbstractController
         ]);
     }
 
+    private function getChoiceLabel($form, string $field, $selectedValue): ?string
+    {
+        $choices = $form->get($field)->getConfig()->getOption('choices'); // [label => value]
+        foreach ($choices as $label => $value) {
+            if ($value === $selectedValue) {
+                return $label;
+            }
+        }
+        return null;
+    }
 
     #[Route('/poste/one/error', name: 'app_poste_one_error', methods: ['GET'])]
     public function error(): Response

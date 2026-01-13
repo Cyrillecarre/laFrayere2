@@ -6,11 +6,27 @@
     <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
 {% endblock %}
 
+{% block javascripts %}
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selects = document.querySelectorAll('.large-font-select');
+    selects.forEach(select => {
+        // Augmenter la taille de la police pour le select
+        select.style.fontSize = '1.2rem';
+        
+        // Pour les navigateurs qui supportent ::part()
+        select.setAttribute('style', '--select-font-size: 1.4rem');
+    });
+});
+</script>
+{% endblock %}
+
 {% block body %}
     <hr class="hr">
     <h1 class="titre">Ajouter une réservation Poste 2</h1>
 
     {{ form_start(form, {'attr': {'class': 'form'}}) }}
+        {{ form_errors(form) }}
         <div>
             {{ form_label(form.start, 'Date d\'arrivée :', {'attr': {'class': 'formStart'}}) }}
         </div>
@@ -52,16 +68,16 @@
             <p class="hrText">Avez-vous pensé à l'amorçage?</p>
         </div>
         <div>
-            {{ form_label(form.pellets, 'Pellets Coppens 8mm Sac de 20kg') }}
+            {{ form_label(form.pellets45, 'Pellets 45% Protéines') }}
         </div>
         <div>
-            {{ form_widget(form.pellets, {'attr': {'class': 'numberForm'}}) }}
+            {{ form_widget(form.pellets45, {'attr': {'class': 'numberFormPellet'}}) }}
         </div>
         <div>
-            {{ form_label(form.graines, 'Sac de graines (rupture)') }}
+            {{ form_label(form.pellets35, 'Pellets 35% Protéines') }}
         </div>
         <div>
-            {{ form_widget(form.graines, {'attr': {'class': 'numberForm'}}) }}
+            {{ form_widget(form.pellets35, {'attr': {'class': 'numberFormPellet'}}) }}
         </div>
         <div class="hrFormGrid">
             <hr class="hrForm">
@@ -76,4 +92,3 @@
     <hr class="hr">
     <a href="{{ path('app_reservation') }}" class="btnAction">Retour</a>
 {% endblock %}
-

@@ -5,8 +5,25 @@ namespace App\Entity;
 use App\Repository\PosteOneRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 
 #[ORM\Entity(repositoryClass: PosteOneRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['poste:read']],
+    denormalizationContext: ['groups' => ['poste:write']]
+)]
 class PosteOne
 {
     #[ORM\Id]

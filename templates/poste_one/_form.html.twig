@@ -1,5 +1,3 @@
-{# templates/poste_one/new.html.twig #}
-
 {% block body %}
     {{ form_start(form, {'attr': {'class': 'form'}}) }}
         <div>
@@ -25,12 +23,12 @@
             {{ form_widget(form.numberOfFishers) }}
         </div>
         <div>
-            {{ form_label(form.pellets, 'Pellets') }}
-            {{ form_widget(form.pellets) }}
+            {{ form_label(form.pellets45, 'Pellets45') }}
+            {{ form_widget(form.pellets45) }}
         </div>
         <div>
-            {{ form_label(form.graines, 'Graines') }}
-            {{ form_widget(form.graines) }}
+            {{ form_label(form.pellets35, 'Pellets35') }}
+            {{ form_widget(form.pellets35) }}
         </div>
         <button class="btnAction">{{ button_label|default('Combien çà coute?') }}</button>
         

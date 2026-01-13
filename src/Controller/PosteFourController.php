@@ -9,12 +9,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Service\PricingService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\GiftRepository;
+use DateTime;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/poste/four')]
 class PosteFourController extends AbstractController
@@ -79,14 +79,18 @@ class PosteFourController extends AbstractController
                 $entityManager->persist($posteFour);
                 $entityManager->flush();
                 $numFishers = $form->get('numberOfFishers')->getData();
-                $pellets = $form->get('pellets')->getData();
-                $graines = $form->get('graines')->getData();
+                // Normaliser les valeurs pellets pour éviter null/chaînes vides
+                $pellets45 = (int) ($form->get('pellets45')->getData() ?? 0);
+                $pellets35 = (int) ($form->get('pellets35')->getData() ?? 0);
+                // Récupérer les libellés correspondants aux valeurs choisies pour l'affichage
+                $pellets45Label = $this->getChoiceLabel($form, 'pellets45', $pellets45) ?? '0';
+                $pellets35Label = $this->getChoiceLabel($form, 'pellets35', $pellets35) ?? '0';
                 $giftCode = $form->get('giftCode')->getData();
                 
                 try {
                     $totalPrice = $this->pricingService->calculatePrice($numNights, $numFishers, [
-                        'pellets' => $pellets,
-                        'graines' => $graines
+                        'pellets45' => $pellets45,
+                        'pellets35' => $pellets35
                     ]);
 
                     $giftValue = 0;
@@ -120,8 +124,10 @@ class PosteFourController extends AbstractController
                     'start' => $posteFour->getStart()->format('Y-m-d'),
                     'end' => $posteFour->getEnd()->format('Y-m-d'),
                     'numberOfFishers' => $form->get('numberOfFishers')->getData(),
-                    'pellets' => $form->get('pellets')->getData(),
-                    'graines' => $form->get('graines')->getData(),
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'pellets45Label' => $pellets45Label,
+                    'pellets35Label' => $pellets35Label,
                     'email' => $form->get('email')->getData(),
                     'phoneNumber' => $form->get('phoneNumber')->getData(),
                     'totalPrice' => $totalPrice,
@@ -132,8 +138,10 @@ class PosteFourController extends AbstractController
                     'totalPrice' => $totalPrice,
                     'numNights' => $numNights,
                     'numFishers' => $numFishers,
-                    'pellets' => $pellets,
-                    'graines' => $graines,
+                    'pellets45' => $pellets45,
+                    'pellets35' => $pellets35,
+                    'pellets45Label' => $pellets45Label,
+                    'pellets35Label' => $pellets35Label,
                     'poste_id' => $posteFour->getId(),
                     'poste_type' => 'quatre',
                     'start' => $posteFour->getStart()->format('Y-m-d'),
@@ -158,8 +166,10 @@ class PosteFourController extends AbstractController
         $totalPrice = (float) $request->query->get('totalPrice');
         $numNights = $request->query->get('numNights');
         $numFishers = $request->query->get('numFishers');
-        $pellets = $request->query->get('pellets');
-        $graines = $request->query->get('graines');
+        $pellets45 = $request->query->get('pellets45');
+        $pellets35 = $request->query->get('pellets35');
+        $pellets45Label = $request->query->get('pellets45Label');
+        $pellets35Label = $request->query->get('pellets35Label');
         $posteId = $request->query->get('poste_id');
         $posteType = $request->query->get('poste_type');
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
@@ -170,14 +180,20 @@ class PosteFourController extends AbstractController
         $reservationDetails = $session->get('reservation_details', []);
         $giftCode = $reservationDetails['giftCode'] ?? null;
         $giftValue = $reservationDetails['giftValue'] ?? 0;
+        // Libellés depuis la session si non passés en query
+        if (!$pellets45Label) { $pellets45Label = $reservationDetails['pellets45Label'] ?? (string)$pellets45; }
+        if (!$pellets35Label) { $pellets35Label = $reservationDetails['pellets35Label'] ?? (string)$pellets35; }
+
 
         return $this->render('poste_four/prix.html.twig', [
             'totalPrice' => $totalPrice,
             'totalPriceAfter' => $totalPriceAfter,
             'numNights' => $numNights,
             'numFishers' => $numFishers,
-            'pellets' => $pellets,
-            'graines' => $graines,
+            'pellets45' => $pellets45,
+            'pellets35' => $pellets35,
+            'pellets45Label' => $pellets45Label,
+            'pellets35Label' => $pellets35Label,
             'stripe_public_key' => $stripePublicKey,
             'poste_id' => $posteId,
             'poste_type' => $posteType,
@@ -186,6 +202,17 @@ class PosteFourController extends AbstractController
             'giftCode' => $giftCode,
             'giftValue' => $giftValue,
         ]);
+    }
+
+    private function getChoiceLabel($form, string $field, $selectedValue): ?string
+    {
+        $choices = $form->get($field)->getConfig()->getOption('choices'); // [label => value]
+        foreach ($choices as $label => $value) {
+            if ($value === $selectedValue) {
+                return $label;
+            }
+        }
+        return null;
     }
 
     #[Route('/poste/four/error', name: 'app_poste_four_error', methods: ['GET'])]
@@ -205,7 +232,6 @@ class PosteFourController extends AbstractController
     #[Route('/{id}/approve', name: 'app_approve_reservation_four')]
     public function approveReservation(PosteFour $posteFour, EntityManagerInterface $entityManager): Response
     {
-        // Marquez la réservation comme approuvée
         $posteFour->setApprouved(true);
         $entityManager->flush();
 

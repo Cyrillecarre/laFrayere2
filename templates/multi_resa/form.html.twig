@@ -4,6 +4,21 @@
     <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
 {% endblock %}
 
+{% block javascripts %}
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selects = document.querySelectorAll('.large-font-select');
+    selects.forEach(select => {
+        // Augmenter la taille de la police pour le select
+        select.style.fontSize = '1.2rem';
+        
+        // Pour les navigateurs qui supportent ::part()
+        select.setAttribute('style', '--select-font-size: 1.4rem');
+    });
+});
+</script>
+{% endblock %}
+
 {% block body %}
     <h1 class="titre">Réserver tous les postes</h1>
 
@@ -35,24 +50,6 @@
         <div>
             <input type="tel" id="phoneNumber" name="phoneNumber" class="formPhone" required>
         </div>
-        
-        <div class="hrFormGrid">
-            <hr class="hrForm">
-            <p class="hrText">Avez-vous pensé à l'amorçage?</p>
-        </div>
-        <div>
-    <label for="pellets" class="numberForm">pellets</label>
-</div>
-<div>
-    <input id="pellets" name="pellets" class="numberForm" value="0" min="0" readonly>
-</div>
-<div>
-    <label for="graines" class="numberForm">graines (rupture)</label>
-</div>
-<div>
-    <input id="graines" name="graines" class="numberForm" value="0" min="0" readonly>
-</div>
-
         <div class="hrFormGrid">
             <hr class="hrForm">
         </div>

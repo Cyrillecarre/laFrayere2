@@ -5,8 +5,25 @@ namespace App\Entity;
 use App\Repository\PosteTwoRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 
 #[ORM\Entity(repositoryClass: PosteTwoRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['poste:read']],
+    denormalizationContext: ['groups' => ['poste:write']]
+)]
 class PosteTwo
 {
     #[ORM\Id]
@@ -26,15 +43,14 @@ class PosteTwo
     #[ORM\Column]
     private ?bool $isApprouved = false;
 
+    #[ORM\Column(length: 7)]
+    private ?string $background_color = null;
+
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
     private ?string $phoneNumber = null;
-
-
-    #[ORM\Column(length: 7)]
-    private ?string $background_color = null;
 
     public function getId(): ?int
     {

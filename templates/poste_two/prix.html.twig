@@ -30,8 +30,8 @@
                 var posteId = document.querySelector('input[name="poste_id"]').value;
                 var numFishers = document.querySelector('input[name="numFishers"]').value;
                 var numNights = document.querySelector('input[name="numNights"]').value;
-                var pellets = document.querySelector('input[name="pellets"]').value;
-                var graines = document.querySelector('input[name="graines"]').value;
+                var pellets45 = document.querySelector('input[name="pellets45"]').value;
+                var pellets35 = document.querySelector('input[name="pellets35"]').value;
                 var posteType = document.querySelector('input[name="poste_type"]').value;
                 var giftValue = document.querySelector('input[name="giftValue"]').value || 0;
                 var startDateStr = document.querySelector('input[name="start"]').value;
@@ -51,8 +51,8 @@
                         posteId: posteId,
                         numFishers: numFishers,
                         numNights: numNights,
-                        pellets: pellets,
-                        graines: graines,
+                        pellets45: pellets45,
+                        pellets35: pellets35,
                         posteType: posteType,
                         start: startDateStr,
                         end: endDateStr,
@@ -83,7 +83,7 @@
 
 {% block body %}
     <main>
-    <h1 class="titre">réservation Poste 2</h1>
+    <h1 class="titre">Réservation Poste 2</h1>
 
     {% if totalPrice is not null %}
         <div class="formPrix">
@@ -91,8 +91,8 @@
             <p>Date de départ : {{ end }}</p>
             <p>Nombre de pêcheurs : {{ numFishers }}</p>
             <p>Nombre de nuits : {{ numNights }}</p>
-            <p>Pellets : {{ pellets }}</p>
-            <p>Graines : {{ graines }}</p>
+            <p>Pellets45 : {{ pellets45Label }}</p>
+            <p>Pellets35 : {{ pellets35Label }}</p>
             <p>Code cadeau appliqué : {{ giftCode }}</p>
             <p>Valeur du code cadeau : {{ giftValue|default(0) }} EUR</p>
             <p>Montant total : {{ totalPrice }} EUR</p>
@@ -104,8 +104,8 @@
             <input type="hidden" name="poste_id" value="{{ poste_id }}">
             <input type="hidden" name="numFishers" value="{{ numFishers }}">
             <input type="hidden" name="numNights" value="{{ numNights }}">
-            <input type="hidden" name="pellets" value="{{ pellets }}">
-            <input type="hidden" name="graines" value="{{ graines }}">
+            <input type="hidden" name="pellets45" value="{{ pellets45 }}">
+            <input type="hidden" name="pellets35" value="{{ pellets35 }}">
             <input type="hidden" name="poste_type" value="{{ poste_type }}">
             <input type="hidden" name="start" value="{{ start }}">
             <input type="hidden" name="end" value="{{ end }}">
