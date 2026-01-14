@@ -27,6 +27,35 @@
     <script src="https://kit.fontawesome.com/6db39e2efc.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.location.hash !== '#titre') return;
+
+            var titleEl = document.querySelector('h1.titre');
+            if (!titleEl) return;
+
+            setTimeout(function () {
+                titleEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        });
+
+        document.addEventListener('click', function (e) {
+            var link = e.target.closest('a');
+            if (!link) return;
+
+            if (!link.closest('.btnAction')) return;
+
+            var href = link.getAttribute('href');
+            if (!href) return;
+
+            if (href.indexOf('#') !== -1) return;
+            if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+            if (href.indexOf('http://') === 0 || href.indexOf('https://') === 0) return;
+
+            link.setAttribute('href', href + '#titre');
+        });
+    </script>
 </head>
 {% block body %}
     <div class="container"> 
@@ -36,11 +65,11 @@
         <div class="navBarre">
             <nav>
                 <ul class="navListe">
-                    <li class="navList"><a href="{{ path('app_home') }}">Accueil</a></li>
-                    <li class="navList"><a href="{{ path('app_reservation') }}">Réservation</a></li>
-                    <li class="navList"><a href="{{ path('app_poste') }}">Postes</a></li>
-                    <li class="navList"><a href="{{ path('app_tarif') }}">Tarifs/Réglementation</a></li>
-                    <li class="navList"><a href="{{ path('app_contact') }}">Contact</a></li>
+                    <li class="navList"><a href="{{ path('app_home') }}#titre">Accueil</a></li>
+                    <li class="navList"><a href="{{ path('app_reservation') }}#titre">Réservation</a></li>
+                    <li class="navList"><a href="{{ path('app_poste') }}#titre">Postes</a></li>
+                    <li class="navList"><a href="{{ path('app_tarif') }}#titre">Tarifs/Réglementation</a></li>
+                    <li class="navList"><a href="{{ path('app_contact') }}#titre">Contact</a></li>
                     <li class="navList"><a href="https://www.facebook.com/profile.php?id=100063643567122&locale=fr_FR" target="_blank"><i class="fa-brands fa-facebook"></i></a></li>
                     <li class="header2"><a href="{{ path('app_login') }}"><i class="fa-solid fa-user-secret"></i> Connexion</a></li>
                 </ul>

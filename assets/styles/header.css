@@ -9,6 +9,10 @@ a {
     color: black;
 }
 
+h1.titre {
+    scroll-margin-top: 5rem;
+}
+
 .burger-menu {
     display: none;
     flex-direction: column;

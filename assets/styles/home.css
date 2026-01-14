@@ -297,13 +297,25 @@
     }
 
     .reservation {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         justify-content: center;
+        align-items: center;
+        gap: 1rem;
         margin: 0 auto;
         padding: 0;
         width: 60%;
         list-style: none;
+    }
+
+    .reservation li.btnAction {
+        grid-column: auto;
+        width: 100%;
+    }
+
+    .reservation li:last-child {
+        grid-column: 1 / -1;
+        justify-self: center;
     }
 
     .couleur {

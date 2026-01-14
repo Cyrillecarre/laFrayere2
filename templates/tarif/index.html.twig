@@ -42,28 +42,50 @@
 <hr class="hr">
     <h1 class="titre">Tarifs</h1>
     <main class="tarifs1">
-        <div class="pecheur hidden">
-            <p>Tarif pour 1 pêcheur</p>
-        </div>
-        <div class="prixJour hidden">
-            <p>Pour 48 heures (2 nuits) : 60 €</p>
-            <p>Pour 72 heures (3 nuits) : 80 €</p>
-            <p>Pour 96 heures (4 nuits) : 95 €</p>
-            <p>Pour 120 heures (5 nuits) : 110 €</p>
-            <p>Pour 144 heures (6 nuits) : 125 €</p>
-            <p>Pour une semaine (7 nuits) : 150 €</p>
-        </div>
-        <div class="pecheur hidden">
-            <p>Tarif pour 2 pêcheurs</p>
-        </div>
-        <div class="prixJour hidden">
-            <p>Pour 48 heures (2 nuits) : 110 €</p>
-            <p>Pour 72 heures (3 nuits) : 150 €</p>
-            <p>Pour 96 heures (4 nuits) : 180 €</p>
-            <p>Pour 120 heures (5 nuits) : 210 €</p>
-            <p>Pour 144 heures (6 nuits) : 240 €</p>
-            <p>Pour une semaine (7 nuits) : 270 €</p>
-        </div>
+        <section class="tarifCard">
+            <div class="pecheur hidden">
+                <p class="tarifTitle">TARIF INDIVIDUEL</p>
+                <p class="tarifSub">- 1 pêcheur</p>
+                <div class="tarifPics">
+                    <img class="tarifPic" src="{{ asset('images/pecheur.png') }}" alt="Pêcheur">
+                </div>
+            </div>
+            <div class="prixJour hidden">
+                <div class="tarifValidite">Valable pour tous les postes du lundi au vendredi inclus<br>Et le week-end uniquement pour le poste 2</div>
+                <div class="tarifListe">
+                    <p class="tarifListeTitre">Durée Tarifs</p>
+                    <p>48 heures (2 nuits) : 60 €</p>
+                    <p>72 heures (3 nuits) : 80 €</p>
+                    <p>96 heures (4 nuits) : 95 €</p>
+                    <p>120 heures (5 nuits) : 110 €</p>
+                    <p>144 heures (6 nuits) : 125 €</p>
+                    <p>Semaine (7 nuits) : 150 €</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="tarifCard">
+            <div class="pecheur hidden">
+                <p class="tarifTitle">TARIF DUO</p>
+                <p class="tarifSub">- 2 pêcheurs</p>
+                <div class="tarifPics tarifPicsDuo">
+                    <img class="tarifPic" src="{{ asset('images/pecheur.png') }}" alt="Pêcheur">
+                    <img class="tarifPic" src="{{ asset('images/pecheur.png') }}" alt="Pêcheur">
+                </div>
+            </div>
+            <div class="prixJour hidden">
+                <div class="tarifValidite">Valable pour tous les postes (1, 2, 3 et 4), semaine et week-end</div>
+                <div class="tarifListe">
+                    <p class="tarifListeTitre">Durée Tarifs</p>
+                    <p>48 heures (2 nuits) : 110 €</p>
+                    <p>72 heures (3 nuits) : 150 €</p>
+                    <p>96 heures (4 nuits) : 180 €</p>
+                    <p>120 heures (5 nuits) : 210 €</p>
+                    <p>144 heures (6 nuits) : 240 €</p>
+                    <p>Semaine (7 nuits) : 270 €</p>
+                </div>
+            </div>
+        </section>
     </main>
     <div class="condition hidden">
         <p>Tous les postes peuvent accueillir 2 pêcheurs</p>

@@ -22,39 +22,59 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block body %}
     <h1 class="titre">Réserver tous les postes</h1>
 
-    <form class="form" action="{{ path('app_reserve_all') }}" method="POST">
+    {% if errorMessage is not empty %}
+        <div class="alert">{{ errorMessage }}</div>
+    {% endif %}
+
+    {{ form_start(form, {'attr': {'class': 'form'}}) }}
+        {{ form_errors(form) }}
         <div>
-            <label for="start" class="formStart">Date d'arrivée :</label>
+            {{ form_label(form.start, 'Date d\'arrivée :', {'attr': {'class': 'formStart'}}) }}
         </div>
         <div>
-            <input type="date" id="start" name="start" class="formStart" required>
+            {{ form_widget(form.start, {'attr': {'class': 'formStart'}}) }}
         </div>
         <div>
-            <label for="end" class="formEnd">Date de départ :</label>
+            {{ form_label(form.end, 'Date de départ :', {'attr': {'class': 'formEnd'}}) }}
         </div>
         <div>
-            <input type="date" id="end" name="end" class="formEnd" required>
+            {{ form_widget(form.end, {'attr': {'class': 'formEnd'}}) }}
         </div>
         <div class="hrFormGrid">
             <hr class="hrForm">
         </div>
         <div>
-            <label for="email" class="formEmail">Email :</label>
+            {{ form_label(form.email, 'Email :', {'attr': {'class': 'formEmail'}}) }}
         </div>
         <div>
-            <input type="email" id="email" name="email" class="formEmail" required>
+            {{ form_widget(form.email, {'attr': {'class': 'formEmail'}}) }}
+            {{ form_errors(form.email) }}
         </div>
         <div>
-            <label for="phoneNumber" class="formPhone">Numéro de téléphone :</label>
+            {{ form_label(form.phoneNumber, 'Numéro de téléphone :', {'attr': {'class': 'formPhone'}}) }}
         </div>
         <div>
-            <input type="tel" id="phoneNumber" name="phoneNumber" class="formPhone" required>
+            {{ form_widget(form.phoneNumber, {'attr': {'class': 'formPhone'}}) }}
+            {{ form_errors(form.phoneNumber) }}
         </div>
         <div class="hrFormGrid">
             <hr class="hrForm">
+            <p class="hrText">Avez-vous pensé à l'amorçage?</p>
+        </div>
+        <div>
+            {{ form_label(form.pellets45, 'Pellets 45% Protéines') }}
+        </div>
+        <div>
+            {{ form_widget(form.pellets45, {'attr': {'class': 'numberFormPellet'}}) }}
+        </div>
+        <div>
+            {{ form_label(form.pellets35, 'Pellets 35% Protéines') }}
+        </div>
+        <div>
+            {{ form_widget(form.pellets35, {'attr': {'class': 'numberFormPellet'}}) }}
         </div>
         <button type="submit" class="btnAction">{{ button_label|default('Combien ça coûte?') }}</button>
-    </form>
+    {{ form_end(form) }}
 
     <hr class="hr">
     <a href="{{ path('app_reservation') }}" class="btnAction">Retour</a>

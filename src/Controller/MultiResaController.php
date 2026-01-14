@@ -46,25 +46,29 @@ class MultiResaController extends AbstractController
     #[Route('/reserve-all', name: 'app_reserve_all', methods: ['GET','POST'])]
     public function reserveAll(Request $request, SessionInterface $session): Response
     {
+        $form = $this->createForm(MultiResaType::class);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
-            // Récupération des données du formulaire soumis
-            $data = $request->request->all();
-    
-            // Vérifiez si les clés existent dans $data avant de les utiliser
-            if (isset($data['start']) && isset($data['end']) && isset($data['email']) && isset($data['phoneNumber']) && isset($data['pellets']) && isset($data['graines'])) {
-                $startDateTime = \DateTime::createFromFormat('Y-m-d', $data['start']);
-                $endDateTime = \DateTime::createFromFormat('Y-m-d', $data['end']);
-                $email = $data['email'];
-                $phoneNumber = $data['phoneNumber'];
-                $pellets = $data['pellets'];
-                $graines = $data['graines'];
+        $errorMessage = null;
 
-                // Calcul de la durée de la réservation en jours
+        if ($form->isSubmitted() && $form->isValid()) {
+            $startDateTime = $form->get('start')->getData();
+            $endDateTime = $form->get('end')->getData();
+            $email = $form->get('email')->getData();
+            $phoneNumber = $form->get('phoneNumber')->getData();
+            $pellets45 = (int) ($form->get('pellets45')->getData() ?? 0);
+            $pellets35 = (int) ($form->get('pellets35')->getData() ?? 0);
+            $pellets45Label = $this->getChoiceLabel($form, 'pellets45', $pellets45) ?? '0';
+            $pellets35Label = $this->getChoiceLabel($form, 'pellets35', $pellets35) ?? '0';
+
+            if (!$startDateTime instanceof \DateTimeInterface || !$endDateTime instanceof \DateTimeInterface) {
+                $errorMessage = 'Dates invalides.';
+            } else {
+                // Calcul de la durée (en jours) => conversion en numNights pour le pricing
                 $duration = ($endDateTime->getTimestamp() - $startDateTime->getTimestamp()) / (60 * 60 * 24);
 
                 if ($duration < 1.7) {
-                    return $this->redirectToRoute('app_poste_one_error'); 
+                    $errorMessage = 'Durée trop courte.';
                 } elseif ($duration <= 2.7) {
                     $numNights = 2;
                 } elseif ($duration <= 3.7) {
@@ -78,63 +82,63 @@ class MultiResaController extends AbstractController
                 } elseif ($duration <= 7.7) {
                     $numNights = 7;
                 } else {
-                    return $this->redirectToRoute('app_poste_one_error');
+                    $errorMessage = 'Durée trop longue.';
                 }
 
-                // Vérification de la disponibilité des postes
-                if (
-                    $this->isPosteAvailable($this->posteOneRepository, $startDateTime, $endDateTime) &&
-                    $this->isPosteAvailable($this->posteTwoRepository, $startDateTime, $endDateTime) &&
-                    $this->isPosteAvailable($this->posteThreeRepository, $startDateTime, $endDateTime) &&
-                    $this->isPosteAvailable($this->posteFourRepository, $startDateTime, $endDateTime)
-                ) {
-                    // Créer et persister chaque réservation de poste
-                    $this->createAndPersistPoste(new PosteOne(), $startDateTime, $endDateTime, $email, $phoneNumber);
-                    $this->createAndPersistPoste(new PosteTwo(), $startDateTime, $endDateTime, $email, $phoneNumber);
-                    $this->createAndPersistPoste(new PosteThree(), $startDateTime, $endDateTime, $email, $phoneNumber);
-                    $this->createAndPersistPoste(new PosteFour(), $startDateTime, $endDateTime, $email, $phoneNumber);
+                if ($errorMessage === null) {
+                    if (
+                        $this->isPosteAvailable($this->posteOneRepository, $startDateTime, $endDateTime) &&
+                        $this->isPosteAvailable($this->posteTwoRepository, $startDateTime, $endDateTime) &&
+                        $this->isPosteAvailable($this->posteThreeRepository, $startDateTime, $endDateTime) &&
+                        $this->isPosteAvailable($this->posteFourRepository, $startDateTime, $endDateTime)
+                    ) {
+                        $this->createAndPersistPoste(new PosteOne(), $startDateTime, $endDateTime, $email, $phoneNumber);
+                        $this->createAndPersistPoste(new PosteTwo(), $startDateTime, $endDateTime, $email, $phoneNumber);
+                        $this->createAndPersistPoste(new PosteThree(), $startDateTime, $endDateTime, $email, $phoneNumber);
+                        $this->createAndPersistPoste(new PosteFour(), $startDateTime, $endDateTime, $email, $phoneNumber);
+                        $this->entityManager->flush();
 
-                    $totalPrice = $this->pricingService->calculateMultiPostePrice($numNights, [
-                        'pellets45' => $pellets45,
-                        'pellets35' => $pellets35
-                    ]);
+                        $totalPrice = $this->pricingService->calculateMultiPostePrice($numNights, [
+                            'pellets45' => $pellets45,
+                            'pellets35' => $pellets35,
+                        ]);
 
-                    // Stocker les détails de la réservation dans la session
-                    $session->set('reservation_details', [
-                        'totalPrice' => $totalPrice,
-                        'numNights' => $numNights,
-                        'pellets45' => $pellets45,
-                        'pellets35' => $pellets35,
-                        'pellets45Label' => $pellets45Label,
-                        'pellets35Label' => $pellets35Label,
-                        'start' => $startDateTime->format('Y-m-d'),
-                        'end' => $endDateTime->format('Y-m-d'),
-                        'email' => $email,
-                        'phoneNumber' => $phoneNumber,
-                    ]);
+                        $session->set('reservation_details', [
+                            'totalPrice' => $totalPrice,
+                            'numNights' => $numNights,
+                            'pellets45' => $pellets45,
+                            'pellets35' => $pellets35,
+                            'pellets45Label' => $pellets45Label,
+                            'pellets35Label' => $pellets35Label,
+                            'start' => $startDateTime->format('Y-m-d'),
+                            'end' => $endDateTime->format('Y-m-d'),
+                            'email' => $email,
+                            'phoneNumber' => $phoneNumber,
+                        ]);
 
-                    // Redirection vers la page "combien ça coûte"
-                    return $this->redirectToRoute('app_multi_prix', [
-                        'totalPrice' => $totalPrice,
-                        'numNights' => $numNights,
-                        'pellets45' => $pellets45,
-                        'pellets35' => $pellets35,
-                        'pellets45Label' => $pellets45Label,
-                        'pellets35Label' => $pellets35Label,
-                        'start' => $startDateTime->format('Y-m-d'),
-                        'end' => $endDateTime->format('Y-m-d'),
-                        'email' => $email,
-                        'phoneNumber' => $phoneNumber,
-                    ]);
-                } else {
-                    return $this->redirectToRoute('app_poste_one_error'); // Si un poste n'est pas disponible
+                        return $this->redirectToRoute('app_multi_prix', [
+                            'totalPrice' => $totalPrice,
+                            'numNights' => $numNights,
+                            'pellets45' => $pellets45,
+                            'pellets35' => $pellets35,
+                            'pellets45Label' => $pellets45Label,
+                            'pellets35Label' => $pellets35Label,
+                            'start' => $startDateTime->format('Y-m-d'),
+                            'end' => $endDateTime->format('Y-m-d'),
+                            'email' => $email,
+                            'phoneNumber' => $phoneNumber,
+                        ]);
+                    }
+
+                    $errorMessage = 'Un poste est déjà réservé sur cette période.';
                 }
-            } else {
-                return $this->redirectToRoute('app_poste_one_error'); // Si les données requises ne sont pas présentes
             }
         }
 
-        return $this->render('multi_resa/form.html.twig');
+        return $this->render('multi_resa/form.html.twig', [
+            'form' => $form,
+            'errorMessage' => $errorMessage,
+        ]);
     }
 
     private function isPosteAvailable($repository, $startDateTime, $endDateTime): bool
@@ -145,10 +149,23 @@ class MultiResaController extends AbstractController
 
     private function createAndPersistPoste($poste, $startDateTime, $endDateTime, $email, $phoneNumber)
     {
+        if ($poste instanceof PosteOne) {
+            $poste->setTitle('Poste 1');
+        } elseif ($poste instanceof PosteTwo) {
+            $poste->setTitle('Poste 2');
+        } elseif ($poste instanceof PosteThree) {
+            $poste->setTitle('Poste 3');
+        } elseif ($poste instanceof PosteFour) {
+            $poste->setTitle('Poste 4');
+        }
+
         $poste->setStart($startDateTime);
         $poste->setEnd($endDateTime);
         $poste->setEmail($email);
         $poste->setPhoneNumber($phoneNumber);
+        if (method_exists($poste, 'setApprouved')) {
+            $poste->setApprouved(false);
+        }
         $this->entityManager->persist($poste);
     }
 
