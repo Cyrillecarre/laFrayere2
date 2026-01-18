@@ -18,8 +18,7 @@
                 <th>Départ</th>
                 <th>Email</th>
                 <th>Tel</th>
-                <th>Modifier</th>
-                <th>Supprimer</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -31,10 +30,6 @@
                 <td>
                     <div class="adminActionsInline">
                         <a href="{{ path('app_poste_one_edit', {'id': poste_one.id}) }}" class="btnAction">modifier</a>
-                    </div>
-                </td>
-                <td>
-                    <div class="adminActionsInline">
                         {{ include('poste_one/_delete_form.html.twig') }}
                     </div>
                 </td>
