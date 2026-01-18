@@ -30,7 +30,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.location.hash !== '#titre') return;
+            var isAdmin = window.location.pathname.indexOf('/admin') === 0;
+            if (window.location.hash !== '#titre' && !isAdmin) return;
 
             var titleEl = document.querySelector('h1.titre');
             if (!titleEl) return;

@@ -4,6 +4,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/admin_poste.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -17,8 +18,7 @@
                 <th>Départ</th>
                 <th>Email</th>
                 <th>Tel</th>
-                <th>Modifier</th>
-                <th>Supprimer</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -28,14 +28,14 @@
                 <td>{{ poste_four.email }}</td>
                 <td>{{ poste_four.phoneNumber }}</td>
                 <td>
-                    <a href="{{ path('app_poste_four_edit', {'id': poste_four.id}) }}" class="btnAction">modifier</a>
-                </td>
-                <td>
-                    {{ include('poste_four/_delete_form.html.twig') }}
+                    <div class="adminActionsInline">
+                        <a href="{{ path('app_poste_four_edit', {'id': poste_four.id}) }}" class="btnAction">modifier</a>
+                        {{ include('poste_four/_delete_form.html.twig') }}
+                    </div>
                 </td>
             </tr>
         </tbody>
     </table>
-    <a href="{{ path('app_poste_four_index') }}" class="btnAction">Retour</a>
+    <a href="{{ path('app_admin') }}" class="btnAction">Retour</a>
 
 {% endblock %}

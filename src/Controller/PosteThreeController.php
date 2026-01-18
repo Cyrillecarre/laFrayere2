@@ -272,7 +272,12 @@ class PosteThreeController extends AbstractController
     #[Route('/{id}', name: 'app_poste_three_delete', methods: ['POST'])]
     public function delete(Request $request, PosteThree $posteThree, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$posteThree->getId(), $request->getPayload()->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($token === null) {
+            $token = $request->getPayload()->get('_token');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$posteThree->getId(), $token)) {
             $entityManager->remove($posteThree);
             $entityManager->flush();
         }

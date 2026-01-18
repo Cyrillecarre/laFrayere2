@@ -6,13 +6,111 @@
 {% endblock %}
 
 {% block body %}
-<h1 class="titre">Bonjour Johannes</h1>
-    <ul class="btnPoste">
-        <a href="{{ path('app_poste_one_index') }}" class="btnAction">Poste 1</a>
-        <a href="{{ path('app_poste_two_index') }}" class="btnAction">Poste 2</a>
-        <a href="{{ path('app_poste_three_index') }}" class="btnAction">Poste 3</a>
-        <a href="{{ path('app_poste_four_index') }}" class="btnAction">Poste 4</a>
-    </ul>
+    <h1 class="titre">Bonjour Les Van Ronsele</h1>
+
+    <div class="adminTopActions">
+        <a href="{{ path('app_admin_reservation_new') }}" class="btnAction">Ajouter réservation</a>
+    </div>
+    <div class="adminGrid">
+
+        <section class="adminCard adminCardFull">
+            <h2 class="adminCardTitle">Réservations à venir</h2>
+            <div class="adminUpcomingGrid">
+                <div class="adminUpcoming">
+                    <h3 class="adminUpcomingTitle">Poste 1</h3>
+                    {% for r in upcoming_one %}
+                        <div class="adminUpcomingItem">
+                            <span>{{ r.start|date('d-m') }} → {{ r.end|date('d-m') }}</span>
+                            <a class="adminUpcomingLink" href="{{ path('app_poste_one_show', {'id': r.id}) }}">Voir</a>
+                        </div>
+                    {% else %}
+                        <div class="adminUpcomingEmpty">Aucune réservation à venir</div>
+                    {% endfor %}
+                </div>
+
+                <div class="adminUpcoming">
+                    <h3 class="adminUpcomingTitle">Poste 2</h3>
+                    {% for r in upcoming_two %}
+                        <div class="adminUpcomingItem">
+                            <span>{{ r.start|date('d-m') }} → {{ r.end|date('d-m') }}</span>
+                            <a class="adminUpcomingLink" href="{{ path('app_poste_two_show', {'id': r.id}) }}">Voir</a>
+                        </div>
+                    {% else %}
+                        <div class="adminUpcomingEmpty">Aucune réservation à venir</div>
+                    {% endfor %}
+                </div>
+
+                <div class="adminUpcoming">
+                    <h3 class="adminUpcomingTitle">Poste 3</h3>
+                    {% for r in upcoming_three %}
+                        <div class="adminUpcomingItem">
+                            <span>{{ r.start|date('d-m') }} → {{ r.end|date('d-m') }}</span>
+                            <a class="adminUpcomingLink" href="{{ path('app_poste_three_show', {'id': r.id}) }}">Voir</a>
+                        </div>
+                    {% else %}
+                        <div class="adminUpcomingEmpty">Aucune réservation à venir</div>
+                    {% endfor %}
+                </div>
+
+                <div class="adminUpcoming">
+                    <h3 class="adminUpcomingTitle">Poste 4</h3>
+                    {% for r in upcoming_four %}
+                        <div class="adminUpcomingItem">
+                            <span>{{ r.start|date('d-m') }} → {{ r.end|date('d-m') }}</span>
+                            <a class="adminUpcomingLink" href="{{ path('app_poste_four_show', {'id': r.id}) }}">Voir</a>
+                        </div>
+                    {% else %}
+                        <div class="adminUpcomingEmpty">Aucune réservation à venir</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <section class="adminCard">
+            <h2 class="adminCardTitle">Indicateurs {{ stats.year }}</h2>
+            <div class="adminKpis">
+                <div class="adminKpi">
+                    <div class="adminKpiLabel">Nombre de Réservations</div>
+                    <div class="adminKpiValue">{{ stats.totalReservations }}</div>
+                </div>
+                <div class="adminKpi">
+                    <div class="adminKpiLabel">Nombre de nuits</div>
+                    <div class="adminKpiValue">{{ stats.totalNights }}</div>
+                </div>
+                <div class="adminKpi">
+                    <div class="adminKpiLabel">Occupation (4 postes)</div>
+                    <div class="adminKpiValue">{{ stats.occupancyPercent }}%</div>
+                </div>
+            </div>
+
+            <div class="adminKpiTable">
+                <div class="adminKpiRow adminKpiHead">
+                    <div>Poste</div>
+                    <div>Réservations</div>
+                    <div>Nuitées</div>
+                </div>
+                <div class="adminKpiRow">
+                    <div>1</div>
+                    <div>{{ stats.byPoste.one.reservations }}</div>
+                    <div>{{ stats.byPoste.one.nights }}</div>
+                </div>
+                <div class="adminKpiRow">
+                    <div>2</div>
+                    <div>{{ stats.byPoste.two.reservations }}</div>
+                    <div>{{ stats.byPoste.two.nights }}</div>
+                </div>
+                <div class="adminKpiRow">
+                    <div>3</div>
+                    <div>{{ stats.byPoste.three.reservations }}</div>
+                    <div>{{ stats.byPoste.three.nights }}</div>
+                </div>
+                <div class="adminKpiRow">
+                    <div>4</div>
+                    <div>{{ stats.byPoste.four.reservations }}</div>
+                    <div>{{ stats.byPoste.four.nights }}</div>
+                </div>
+            </div>
+        </section>
+    </div>
 
 {% endblock %}
 

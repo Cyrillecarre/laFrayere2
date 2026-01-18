@@ -19,6 +19,10 @@
     margin-bottom: 5rem;
 }
 
+body {
+    background-color: rgb(188, 227, 227);
+}
+
 .form {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -31,7 +35,7 @@
     height: auto;
     padding-top: 1rem;
     gap: 1rem;
-    background-color: rosybrown;
+    background-color: rgb(188, 227, 227);
     border: 2px solid rgb(5, 123, 84);
     border-radius: 2rem;
 }
@@ -52,7 +56,7 @@
 
 .formSubmit {
     display: flex;
-    background-color: salmon;
+    background-color: rgb(188, 227, 227);
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -75,15 +79,36 @@
     }
 
     .form {
+        display: grid;
+        grid-template-columns: 35% 65%;
+        justify-items: center;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin: 0 auto;
         width: 90%;
+        height: auto;
+        padding-top: 0.7rem;
+        gap: 0.3rem;
+        background-color: rgb(188, 227, 227);
+        border: 2px solid rgb(5, 123, 84);
+        border-radius: 2rem;
     }
 
     .hr {
-        width: 80%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        width: 60%;
+        height: 0.1rem;
+        background-color:rgb(5, 123, 84);
+        margin-top: 1rem;
+        margin-bottom: 1rem;
     }
 
     .formInput {
-        width: 8rem;
+        width: 11rem;
     }
 
     .formLabel {

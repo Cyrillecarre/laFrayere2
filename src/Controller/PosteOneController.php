@@ -260,7 +260,7 @@ class PosteOneController extends AbstractController
             $posteOne->setApprouved(true);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_poste_one_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_admin', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('poste_one/edit.html.twig', [
@@ -272,7 +272,12 @@ class PosteOneController extends AbstractController
     #[Route('/{id}', name: 'app_poste_one_delete', methods: ['POST'])]
     public function delete(Request $request, PosteOne $posteOne, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$posteOne->getId(), $request->getPayload()->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($token === null) {
+            $token = $request->getPayload()->get('_token');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$posteOne->getId(), $token)) {
             $entityManager->remove($posteOne);
             $entityManager->flush();
         }

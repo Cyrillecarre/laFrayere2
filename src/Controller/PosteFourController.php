@@ -260,7 +260,7 @@ class PosteFourController extends AbstractController
             $posteFour->setApprouved(true);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_poste_four_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_admin', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('poste_four/edit.html.twig', [
@@ -272,7 +272,12 @@ class PosteFourController extends AbstractController
     #[Route('/{id}', name: 'app_poste_four_delete', methods: ['POST'])]
     public function delete(Request $request, PosteFour $posteFour, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$posteFour->getId(), $request->getPayload()->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($token === null) {
+            $token = $request->getPayload()->get('_token');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$posteFour->getId(), $token)) {
             $entityManager->remove($posteFour);
             $entityManager->flush();
         }

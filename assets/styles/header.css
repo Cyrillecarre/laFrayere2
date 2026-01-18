@@ -100,10 +100,10 @@ h1.titre {
     align-items: center;
     justify-content: center;
     height: 100%;
-    width: 100%;
     gap: 20px;
     cursor: pointer;
     font-size: 1.5rem;
+    padding: 0;
 }
 
 .navList i {
@@ -153,9 +153,9 @@ mask-image:
     .container {
         display: flex;
         flex-direction: column;
-        height: 43rem;
-        margin: 0 0;
-        padding: 0 0;
+        height: 37rem;
+        margin: 0;
+        padding: 0;
     }
 
     .header {
@@ -167,6 +167,12 @@ mask-image:
         background-position: center top;
         background-size: cover;
     }
+
+    .header2 {
+        gap: 1rem;
+        margin: 0;
+        height: 15px;
+    }
     
     .logo {
         display: none;
@@ -176,11 +182,12 @@ mask-image:
         display: flex;
         flex-direction: column;
         width: 100%;
-        margin: 0 auto;
-        padding-top: 1.7rem;
+        margin: -40 auto;
         flex-grow: 1;
         align-items: center;
         background-color: rgba(166, 163, 163, 0.8);
+        height: 60px;
+        padding: 0;
     }
 
     .nav {
@@ -197,8 +204,14 @@ mask-image:
     .navListe {
         display: flex;
         flex-direction: column;
-        padding: 10px 0;
         text-align: center;
+        gap: 6px;
+        margin: 0 auto;
+    }
+
+    .navListe ul li {
+        padding: 0;
+        margin: 0;
     }
     
     

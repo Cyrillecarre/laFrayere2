@@ -249,7 +249,7 @@ class PosteTwoController extends AbstractController
             $posteTwo->setApprouved(true);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_poste_two_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_admin', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('poste_two/edit.html.twig', [
@@ -261,7 +261,12 @@ class PosteTwoController extends AbstractController
     #[Route('/{id}', name: 'app_poste_two_delete', methods: ['POST'])]
     public function delete(Request $request, PosteTwo $posteTwo, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$posteTwo->getId(), $request->getPayload()->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($token === null) {
+            $token = $request->getPayload()->get('_token');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$posteTwo->getId(), $token)) {
             $entityManager->remove($posteTwo);
             $entityManager->flush();
         }
