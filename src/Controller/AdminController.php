@@ -7,6 +7,7 @@ use App\Entity\PosteOne;
 use App\Entity\PosteThree;
 use App\Entity\PosteTwo;
 use App\Form\AdminReservationType;
+use App\Form\AdminMultiReservationType;
 use App\Repository\PosteFourRepository;
 use App\Repository\PosteOneRepository;
 use App\Repository\PosteThreeRepository;
@@ -195,6 +196,80 @@ class AdminController extends AbstractController
         }
 
         return $this->render('admin/new_reservation.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/admin/reservation/new-all', name: 'app_admin_reservation_new_all', methods: ['GET', 'POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function newReservationAll(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        PosteOneRepository $posteOneRepository,
+        PosteTwoRepository $posteTwoRepository,
+        PosteThreeRepository $posteThreeRepository,
+        PosteFourRepository $posteFourRepository
+    ): Response {
+        $form = $this->createForm(AdminMultiReservationType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $start = $form->get('start')->getData();
+            $end = $form->get('end')->getData();
+            $email = $form->get('email')->getData();
+            $phoneNumber = $form->get('phoneNumber')->getData();
+
+            if ($start instanceof \DateTimeImmutable) {
+                $start = $start->setTime(14, 0);
+            } elseif ($start instanceof \DateTimeInterface) {
+                $start = (clone $start)->setTime(14, 0);
+            }
+
+            if ($end instanceof \DateTimeImmutable) {
+                $end = $end->setTime(11, 0);
+            } elseif ($end instanceof \DateTimeInterface) {
+                $end = (clone $end)->setTime(11, 0);
+            }
+
+            if (!$start instanceof \DateTimeInterface || !$end instanceof \DateTimeInterface || $end <= $start) {
+                $this->addFlash('error', 'Dates invalides.');
+                return $this->redirectToRoute('app_admin_reservation_new_all');
+            }
+
+            $hasOverlap =
+                count($posteOneRepository->findOverlappingEvents($start, $end)) > 0 ||
+                count($posteTwoRepository->findOverlappingEvents($start, $end)) > 0 ||
+                count($posteThreeRepository->findOverlappingEvents($start, $end)) > 0 ||
+                count($posteFourRepository->findOverlappingEvents($start, $end)) > 0;
+
+            if ($hasOverlap) {
+                $this->addFlash('error', "Un poste est déjà réservé sur cette période.");
+                return $this->redirectToRoute('app_admin_reservation_new_all');
+            }
+
+            $reservations = [
+                '1' => new PosteOne(),
+                '2' => new PosteTwo(),
+                '3' => new PosteThree(),
+                '4' => new PosteFour(),
+            ];
+
+            foreach ($reservations as $posteNumber => $reservation) {
+                $reservation->setTitle('Poste ' . $posteNumber);
+                $reservation->setStart($start);
+                $reservation->setEnd($end);
+                $reservation->setEmail($email);
+                $reservation->setPhoneNumber($phoneNumber);
+                $reservation->setApprouved(true);
+                $entityManager->persist($reservation);
+            }
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_admin');
+        }
+
+        return $this->render('admin/new_multi_reservation.html.twig', [
             'form' => $form,
         ]);
     }

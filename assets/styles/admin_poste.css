@@ -126,3 +126,22 @@
         margin: 0;
     }
 }
+
+@media only screen and (min-width: 769px) {
+    .adminActionsInline {
+        display: flex;
+        flex-direction: row;
+        gap: 0.75rem;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .adminActionsInline .btnAction {
+        margin: 0 !important;
+    }
+
+    .adminActionsInline form {
+        margin: 0;
+    }
+}

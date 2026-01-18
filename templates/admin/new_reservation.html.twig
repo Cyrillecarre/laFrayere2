@@ -10,6 +10,10 @@
     <hr class="hr">
     <h1 class="titre">Ajouter une réservation (Admin)</h1>
 
+    <div class="adminTopActions">
+        <a href="{{ path('app_admin_reservation_new_all') }}" class="btnAction">Réservation étang complet</a>
+    </div>
+
     {{ form_start(form, {'attr': {'class': 'form'}}) }}
         {{ form_errors(form) }}
 

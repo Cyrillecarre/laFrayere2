@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Réservation étang complet{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/poste.css') }}">
+{% endblock %}
+
+{% block body %}
+    <hr class="hr">
+    <h1 class="titre">Réservation étang complet (Admin)</h1>
+
+    {{ form_start(form, {'attr': {'class': 'form'}}) }}
+        {{ form_errors(form) }}
+
+        <div>
+            {{ form_label(form.start, "Date d'arrivée :") }}
+        </div>
+        <div>
+            {{ form_widget(form.start) }}
+            {{ form_errors(form.start) }}
+        </div>
+
+        <div>
+            {{ form_label(form.end, 'Date de départ :') }}
+        </div>
+        <div>
+            {{ form_widget(form.end) }}
+            {{ form_errors(form.end) }}
+        </div>
+
+        <div>
+            {{ form_label(form.email, 'Email') }}
+        </div>
+        <div>
+            {{ form_widget(form.email) }}
+            {{ form_errors(form.email) }}
+        </div>
+
+        <div>
+            {{ form_label(form.phoneNumber, 'Numéro de tel') }}
+        </div>
+        <div>
+            {{ form_widget(form.phoneNumber) }}
+            {{ form_errors(form.phoneNumber) }}
+        </div>
+
+        <button type="submit" class="btnAction">Créer</button>
+    {{ form_end(form) }}
+
+    <hr class="hr">
+    <a href="{{ path('app_admin_reservation_new') }}" class="btnAction">Retour</a>
+{% endblock %}
