@@ -6,6 +6,86 @@
     <link rel="stylesheet" href="{{ asset('styles/gift.css') }}">
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+    (function () {
+        var attempts = 0;
+        function init() {
+            var payButton = document.getElementById('payButton');
+            if (!payButton) {
+                attempts += 1;
+                if (attempts <= 20) {
+                    setTimeout(init, 50);
+                    return;
+                }
+                console.error('Bouton payButton introuvable dans le DOM.');
+                return;
+            }
+
+            if (typeof Stripe === 'undefined') {
+                console.error('Stripe.js non chargé (Stripe est undefined).');
+                return;
+            }
+
+            var stripe = Stripe('{{ stripe_public_key }}');
+
+            payButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                console.log('Bouton cliqué');
+
+                fetch('{{ path('app_gift_payment', {id: gift.id}) }}', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                })
+                .then(async (response) => {
+                    const contentType = response.headers.get('content-type') || '';
+                    const payload = contentType.includes('application/json')
+                        ? await response.json().catch(() => null)
+                        : await response.text().catch(() => '');
+
+                    if (!response.ok) {
+                        console.error('Erreur serveur gift payment', {
+                            status: response.status,
+                            payload: payload,
+                        });
+                        throw new Error('Erreur lors de la création de la session Stripe (HTTP ' + response.status + ').');
+                    }
+
+                    return payload;
+                })
+                .then(data => {
+                    console.log('Données retournées par le serveur :', data);
+                    if (data && data.id) {
+                        return stripe.redirectToCheckout({ sessionId: data.id });
+                    }
+                    alert('Erreur : ID de session manquant.');
+                })
+                .then(result => {
+                    if (result && result.error) {
+                        console.error('Erreur Stripe redirectToCheckout', result.error);
+                        alert(result.error.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message || 'Une erreur est survenue.');
+                });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+{% endblock %}
+
 {% block body %}
 <main>
     <h1 class="titre">Offrir une cartes cadeaux</h1>
@@ -14,44 +94,8 @@
         <form class="form-container-payment">
             <p>Montant : {{ gift.count }} €</p>
             <p>Email : {{ gift.email }}</p>
-        <button id="payButton" class="btn">Payer</button>
+        <button id="payButton" type="button" class="btn">Payer</button>
         </form>
     <span><img src="{{ asset('images/present.png') }}" alt="gift" class="gift"></span>
 </main>
-    <script src="https://js.stripe.com/v3/"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-    var stripe = Stripe('{{ stripe_public_key }}');
-    var payButton = document.getElementById('payButton');
-    if (payButton) {
-        payButton.addEventListener('click', function () {
-            console.log('Bouton cliqué');
-            fetch('/gift/payment/{{ gift.id }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({})
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur lors de la création de la session Stripe');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Données retournées par le serveur :', data);
-                if (data.id) {
-                    stripe.redirectToCheckout({ sessionId: data.id });
-                } else {
-                    alert('Erreur : ID de session manquant.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    } else {
-        console.error('Bouton payButton introuvable dans le DOM.');
-    }
-});
-</script>
-
 {% endblock %}
