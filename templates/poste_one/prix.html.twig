@@ -38,6 +38,7 @@
                 var startDateStr = document.querySelector('input[name="start"]').value;
                 var endDateStr = document.querySelector('input[name="end"]').value;
                 var totalPriceAfter = document.querySelector('input[name="totalPriceAfter"]').value;
+                var token = document.querySelector('input[name="token"]').value;
 
                 fetch("{{ path('app_payment_create') }}", {
                     method: 'POST',
@@ -57,7 +58,8 @@
                         posteType: posteType,
                         start: startDateStr,
                         end: endDateStr,
-                        giftValue: giftValue,
+                        giftValue: giftValue, totalPriceAfter: totalPriceAfter,
+                        token: token,
                     })
                 })
                     .then(response => {
@@ -111,6 +113,7 @@
                 <input type="hidden" name="start" value="{{ start }}">
                 <input type="hidden" name="end" value="{{ end }}">
                 <input type="hidden" name="giftValue" value="{{ giftValue|default(0) }}">
+            <input type="hidden" name="token" value="{{ token }}">
                 {% if totalPriceAfter > 0 %}
                     <div>
                         <button type="button" id="checkout-button" class="btnAction">Régler la totalité</button>

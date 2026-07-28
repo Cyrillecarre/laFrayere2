@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\PosteTwo;
+use App\Entity\PendingReservation;
 use App\Form\PosteTwoType;
 use App\Repository\PosteTwoRepository;
+use App\Repository\PendingReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +38,7 @@ class PosteTwoController extends AbstractController
     }
 
     #[Route('/new', name: 'app_poste_two_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteTwoRepository $posteTwoRepository, SessionInterface $session, GiftRepository $giftRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer, PosteTwoRepository $posteTwoRepository, SessionInterface $session, GiftRepository $giftRepository, PendingReservationRepository $pendingReservationRepository): Response
     {
         if ($session->has('reservation_details')) {
             $session->remove('reservation_details');
@@ -116,7 +118,9 @@ class PosteTwoController extends AbstractController
                     $totalPriceAfter = $totalPrice;
                 }
 
-                $session->set('reservation_details', [
+                // Stocker dans PendingReservation au lieu de la session
+                $pendingReservation = new PendingReservation();
+                $pendingReservation->setDetails([
                     'posteId' => $posteTwo->getId(),
                     'poste_title' => 'Poste 2',
                     'poste_type' => 'deux',
@@ -134,7 +138,11 @@ class PosteTwoController extends AbstractController
                     'totalPrice' => $totalPrice,
                     'totalPriceAfter' => $totalPriceAfter,
                 ]);
-                
+                $entityManager->persist($pendingReservation);
+                $entityManager->flush();
+
+                $token = $pendingReservation->getToken();
+
                 return $this->redirectToRoute('app_poste_two_prix', [
                     'totalPrice' => $totalPrice,
                     'numNights' => $numNights,
@@ -150,6 +158,7 @@ class PosteTwoController extends AbstractController
                     'giftCode' => $giftCode,
                     'giftValue' => $giftValue,
                     'totalPriceAfter' => $totalPriceAfter,
+                    'token' => $token,
                 ]);
             }
         }
@@ -176,6 +185,7 @@ class PosteTwoController extends AbstractController
         $start = \DateTime::createFromFormat('Y-m-d', $request->query->get('start'));
         $end = \DateTime::createFromFormat('Y-m-d', $request->query->get('end'));
         $totalPriceAfter = $request->query->get('totalPriceAfter',$totalPrice);
+        $token = $request->query->get('token');
 
         // Récupérer les détails de réservation dans la session
         $reservationDetails = $session->get('reservation_details', []);
@@ -202,6 +212,7 @@ class PosteTwoController extends AbstractController
             'end' => $end->format('d-m'),
             'giftCode' => $giftCode,
             'giftValue' => $giftValue,
+            'token' => $token,
         ]);
     }
 

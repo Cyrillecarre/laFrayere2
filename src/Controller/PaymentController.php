@@ -17,6 +17,8 @@ use App\Entity\PosteOne;
 use App\Entity\PosteTwo;
 use App\Entity\PosteThree;
 use App\Entity\PosteFour;
+use App\Entity\PendingReservation;
+use App\Repository\PendingReservationRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -81,6 +83,7 @@ class PaymentController extends AbstractController
             $pellets45 = $data['pellets45'];
             $pellets35 = $data['pellets35'];
             $giftValue = $data['giftValue'] ?? 0;
+            $token = $data['token'] ?? null;
 
             if ($isDeposit) {
                 $depositAmount = $totalPriceAfter * 0.30;
@@ -115,6 +118,7 @@ class PaymentController extends AbstractController
                     'pellets45' => $pellets45,
                     'pellets35' => $pellets35,
                     'giftValue' => $giftValue,
+                    'token' => $token,
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
                 'cancel_url' => $this->generateUrl('app_payment_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'metadata' => [
@@ -146,18 +150,34 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/payment-success', name: 'app_payment_success')]
-    public function paymentSuccess(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session, GiftRepository $giftRepository): Response
+    public function paymentSuccess(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session, GiftRepository $giftRepository, PendingReservationRepository $pendingReservationRepository): Response
     {
         $this->logger->info('Début de paymentSuccess', [
             'query_params' => $request->query->all(),
-            'session_details' => $session->get('reservation_details')
         ]);
 
         try {
-            $reservationDetails = $session->get('reservation_details');
+            $token = $request->query->get('token');
+            if (!$token) {
+                $this->logger->error('Token manquant dans la requête');
+                throw $this->createNotFoundException('Token manquant.');
+            }
+
+            $pendingReservation = $pendingReservationRepository->findByToken($token);
+            if (!$pendingReservation) {
+                $this->logger->error('PendingReservation non trouvée pour le token', ['token' => $token]);
+                throw $this->createNotFoundException('Réservation non trouvée ou expirée.');
+            }
+
+            if ($pendingReservation->isExpired()) {
+                $this->logger->error('PendingReservation expirée', ['token' => $token]);
+                throw $this->createNotFoundException('Réservation expirée.');
+            }
+
+            $reservationDetails = $pendingReservation->getDetails();
             if (!$reservationDetails) {
-                $this->logger->error('Détails de réservation non trouvés dans la session');
-                throw $this->createNotFoundException('Détails de la réservation non trouvés dans la session.');
+                $this->logger->error('Détails de réservation vides dans PendingReservation');
+                throw $this->createNotFoundException('Détails de la réservation non trouvés.');
             }
 
             $remainingGiftValue = 0;
@@ -274,8 +294,9 @@ class PaymentController extends AbstractController
                 throw $e;
             }
 
-            // Nettoyage de la session
-            $session->remove('reservation_details');
+            // Nettoyage de la PendingReservation
+            $entityManager->remove($pendingReservation);
+            $entityManager->flush();
 
             return $this->render('payment/success.html.twig', [
                 'stripe_public_key' => $this->getParameter('stripe_public_key'),
@@ -337,6 +358,7 @@ class PaymentController extends AbstractController
 
             $pellets45 = $data['pellets45'];
             $pellets35 = $data['pellets35'];
+            $token = $data['token'] ?? null;
 
             if ($isDeposit) {
                 $depositAmount = $totalPrice * 0.30;
@@ -371,6 +393,7 @@ class PaymentController extends AbstractController
                     'pellets35' => $pellets35,
                     'email' => $email,
                     'phoneNumber' => $phoneNumber,
+                    'token' => $token,
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
                 'cancel_url' => $this->generateUrl('app_payment_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'metadata' => [
@@ -393,18 +416,30 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/payment-success-multi', name: 'app_paymentMulti_success')]
-    public function paymentSuccessMulti(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    public function paymentSuccessMulti(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, SessionInterface $session, PendingReservationRepository $pendingReservationRepository): Response
     {
-        $totalPrice = $request->query->get('totalPrice');
+        $token = $request->query->get('token');
+        if (!$token) {
+            throw $this->createNotFoundException('Token manquant.');
+        }
+
+        $pendingReservation = $pendingReservationRepository->findByToken($token);
+        if (!$pendingReservation || $pendingReservation->isExpired()) {
+            throw $this->createNotFoundException('Réservation non trouvée ou expirée.');
+        }
+
+        $reservationDetails = $pendingReservation->getDetails();
+
+        $totalPrice = $reservationDetails['totalPrice'];
         $isDeposit = $request->query->get('is_deposit');
-        $startDateTime = \DateTime::createFromFormat('d-m-Y', $request->query->get('start'));
-        $endDateTime = \DateTime::createFromFormat('d-m-Y', $request->query->get('end'));
-        $pellets45 = $request->query->get('pellets45');
-        $pellets35 = $request->query->get('pellets35');
-        $pellets45Label = $this->mapPelletLabel('pellets45', (int)$pellets45);
-        $pellets35Label = $this->mapPelletLabel('pellets35', (int)$pellets35);
-        $email = $request->query->get('email');
-        $phoneNumber = $request->query->get('phoneNumber');
+        $startDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['start']);
+        $endDateTime = \DateTime::createFromFormat('Y-m-d', $reservationDetails['end']);
+        $pellets45 = $reservationDetails['pellets45'];
+        $pellets35 = $reservationDetails['pellets35'];
+        $pellets45Label = $reservationDetails['pellets45Label'];
+        $pellets35Label = $reservationDetails['pellets35Label'];
+        $email = $reservationDetails['email'];
+        $phoneNumber = $reservationDetails['phoneNumber'];
 
         $startDateTime->setTime(14, 0);
         $endDateTime->setTime(11, 0);
@@ -466,6 +501,10 @@ class PaymentController extends AbstractController
         ->html($emailContent);
 
     $mailer->send($emailMessage);
+
+    // Nettoyage de la PendingReservation
+    $entityManager->remove($pendingReservation);
+    $entityManager->flush();
 
     return $this->render('payment/successMulti.html.twig', [
         'stripe_public_key' => $this->getParameter('stripe_public_key'),

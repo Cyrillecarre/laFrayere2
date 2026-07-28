@@ -5,10 +5,12 @@ use App\Entity\PosteOne;
 use App\Entity\PosteTwo;
 use App\Entity\PosteThree;
 use App\Entity\PosteFour;
+use App\Entity\PendingReservation;
 use App\Repository\PosteOneRepository;
 use App\Repository\PosteTwoRepository;
 use App\Repository\PosteThreeRepository;
 use App\Repository\PosteFourRepository;
+use App\Repository\PendingReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +28,7 @@ class MultiResaController extends AbstractController
     private $posteThreeRepository;
     private $posteFourRepository;
     private $pricingService;
+    private $pendingReservationRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -33,7 +36,8 @@ class MultiResaController extends AbstractController
         PosteTwoRepository $posteTwoRepository,
         PosteThreeRepository $posteThreeRepository,
         PosteFourRepository $posteFourRepository,
-        PricingService $pricingService
+        PricingService $pricingService,
+        PendingReservationRepository $pendingReservationRepository
     ) {
         $this->entityManager = $entityManager;
         $this->posteOneRepository = $posteOneRepository;
@@ -41,6 +45,7 @@ class MultiResaController extends AbstractController
         $this->posteThreeRepository = $posteThreeRepository;
         $this->posteFourRepository = $posteFourRepository;
         $this->pricingService = $pricingService;
+        $this->pendingReservationRepository = $pendingReservationRepository;
     }
 
     #[Route('/reserve-all', name: 'app_reserve_all', methods: ['GET','POST'])]
@@ -103,7 +108,9 @@ class MultiResaController extends AbstractController
                             'pellets35' => $pellets35,
                         ]);
 
-                        $session->set('reservation_details', [
+                        // Stocker dans PendingReservation au lieu de la session
+                        $pendingReservation = new PendingReservation();
+                        $pendingReservation->setDetails([
                             'totalPrice' => $totalPrice,
                             'numNights' => $numNights,
                             'pellets45' => $pellets45,
@@ -115,6 +122,10 @@ class MultiResaController extends AbstractController
                             'email' => $email,
                             'phoneNumber' => $phoneNumber,
                         ]);
+                        $this->entityManager->persist($pendingReservation);
+                        $this->entityManager->flush();
+
+                        $token = $pendingReservation->getToken();
 
                         return $this->redirectToRoute('app_multi_prix', [
                             'totalPrice' => $totalPrice,
@@ -127,6 +138,7 @@ class MultiResaController extends AbstractController
                             'end' => $endDateTime->format('Y-m-d'),
                             'email' => $email,
                             'phoneNumber' => $phoneNumber,
+                            'token' => $token,
                         ]);
                     }
 
@@ -185,6 +197,7 @@ class MultiResaController extends AbstractController
         $end = \DateTime::createFromFormat('Y-m-d', $request->query->get('end'));
         $email = $request->query->get('email');
         $phoneNumber = $request->query->get('phoneNumber');
+        $token = $request->query->get('token');
 
 
         return $this->render('multi_resa/prix.html.twig', [
@@ -201,6 +214,7 @@ class MultiResaController extends AbstractController
             'end' => $end->format('d-m'),
             'email' => $email,
             'phoneNumber' => $phoneNumber,
+            'token' => $token,
         ]);
     }
 

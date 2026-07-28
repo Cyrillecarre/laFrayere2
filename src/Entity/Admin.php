@@ -25,7 +25,7 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var list<string> The user roles
      */
-    #[ORM\Column]
+    #[ORM\Column(type: 'array')]
     private array $roles = [];
 
     /**

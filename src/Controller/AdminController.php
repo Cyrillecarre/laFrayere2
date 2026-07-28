@@ -106,10 +106,10 @@ class AdminController extends AbstractController
             'poste_twos' => $poste_two,
             'poste_threes' => $poste_three,
             'poste_fours' => $poste_four,
-            'upcoming_one' => array_slice($upcoming_one, 0, 6),
-            'upcoming_two' => array_slice($upcoming_two, 0, 6),
-            'upcoming_three' => array_slice($upcoming_three, 0, 6),
-            'upcoming_four' => array_slice($upcoming_four, 0, 6),
+            'upcoming_one' => $upcoming_one,
+            'upcoming_two' => $upcoming_two,
+            'upcoming_three' => $upcoming_three,
+            'upcoming_four' => $upcoming_four,
             'stats' => $stats,
         ]);
     }
