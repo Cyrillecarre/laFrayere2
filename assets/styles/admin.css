@@ -43,7 +43,7 @@
     border-radius: 0.5rem;
     width: 9rem;
     height: 3rem;
-    border: 1px solid rgb(5, 123, 84);
+    border: 1px solid #0083b0;
 }
 
 .table {
@@ -85,7 +85,7 @@
     margin: 0 auto;
     width: 60%;
     height: 0.2rem;
-    background-color:rgb(5, 123, 84);
+    background-color:#0083b0;
     margin-top: 5rem;
     margin-bottom: 5rem;
 }
@@ -107,7 +107,7 @@
 
 .adminCard {
     background-color: rgb(216, 216, 214);
-    border: 1px solid rgb(5, 123, 84);
+    border: 1px solid #0083b0;
     border-radius: 14px;
     padding: 1.25rem;
     box-sizing: border-box;
@@ -202,6 +202,21 @@
     align-items: center;
     gap: 1rem;
     padding: 0.35rem 0;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+.adminUpcomingItem:nth-child(odd) {
+    background-color: rgba(0, 131, 176, 0.1);
+}
+
+.adminUpcomingItem:nth-child(even) {
+    background-color: rgba(0, 131, 176, 0.2);
+}
+
+.adminUpcomingItem:hover {
+    background-color: rgba(0, 131, 176, 0.3);
 }
 
 .adminUpcomingLink {
@@ -209,7 +224,7 @@
 }
 
 .adminUpcomingLink {
-    color: rgb(5, 123, 84);
+    color: #0083b0;
     font-weight: bold;
 }
 
@@ -368,7 +383,7 @@
         margin: 0 auto;
         width: 60%;
         height: 0.1rem;
-        background-color:rgb(5, 123, 84);
+        background-color:#0083b0;
         margin-top: 1rem;
         margin-bottom: 1rem;
     }
